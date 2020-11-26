@@ -1,4 +1,4 @@
-package it.dawidwojdyla.view;
+package it.dawidwojdyla.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
