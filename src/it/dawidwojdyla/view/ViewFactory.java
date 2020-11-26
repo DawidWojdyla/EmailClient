@@ -25,26 +25,16 @@ public class ViewFactory {
     public void showLoginWindow() {
 
         AbstractController controller = new LoginWindowController(emailManager, this, "loginWindow.fxml");
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(controller.getFxmlName()));
-        fxmlLoader.setController(controller);
-        Parent parent;
-        try {
-            parent = fxmlLoader.load();
-        } catch(IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        Scene scene = new Scene(parent);
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.show();
-
+        initializeStage(controller);
     }
 
     public void showMainWindow() {
 
         AbstractController controller = new MainWindowController(emailManager, this, "MainWindow.fxml");
+        initializeStage(controller);
+    }
+
+    private void initializeStage(AbstractController controller) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(controller.getFxmlName()));
         fxmlLoader.setController(controller);
         Parent parent;
@@ -59,6 +49,5 @@ public class ViewFactory {
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.show();
-
     }
 }
