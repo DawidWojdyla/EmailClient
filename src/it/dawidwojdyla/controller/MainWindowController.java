@@ -27,7 +27,7 @@ public class MainWindowController extends AbstractController {
 
     @FXML
     void optionsAction() {
-
+        viewFactory.showOptionsWindow();
     }
 
 }
