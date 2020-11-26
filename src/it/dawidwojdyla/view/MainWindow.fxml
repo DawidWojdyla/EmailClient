@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.web.WebView?>
+
+
+<AnchorPane prefHeight="599.0" prefWidth="738.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.dawidwojdyla.view.MainWindow">
+   <children>
+      <MenuBar layoutY="-5.0" prefHeight="32.0" prefWidth="600.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+                  <MenuItem mnemonicParsing="false" text="Open" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Options" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="About">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <TreeView layoutY="27.0" prefHeight="572.0" prefWidth="180.0" />
+      <TableView layoutX="179.0" layoutY="27.0" prefHeight="198.0" prefWidth="561.0">
+        <columns>
+          <TableColumn prefWidth="87.0" text="Sender" />
+          <TableColumn prefWidth="137.0" text="Subject" />
+            <TableColumn prefWidth="179.0" text="Recipient" />
+            <TableColumn minWidth="0.0" prefWidth="62.0" text="Size" />
+            <TableColumn minWidth="0.0" prefWidth="95.0" text="Date" />
+        </columns>
+      </TableView>
+      <WebView layoutX="200.0" layoutY="225.0" prefHeight="374.0" prefWidth="540.0" />
+   </children>
+</AnchorPane>
