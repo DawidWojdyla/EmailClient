@@ -34,7 +34,8 @@ public class OptionsWindowController extends AbstractController implements Initi
     @FXML
     void applyButtonAction() {
 
-        //save and close window
+        viewFactory.setColorTheme(themePicker.getValue());
+        viewFactory.setFontSize(FontSize.values()[(int)(fontSizePicker.getValue())]);
         viewFactory.closeStage((Stage) themePicker.getScene().getWindow());
     }
 
