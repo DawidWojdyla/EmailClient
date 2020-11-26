@@ -17,4 +17,8 @@ public abstract class AbstractController {
         this.viewFactory = viewFactory;
         this.fxmlName = fxmlName;
     }
+
+    public String getFxmlName() {
+        return fxmlName;
+    }
 }
