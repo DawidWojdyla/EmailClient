@@ -4,6 +4,7 @@ import it.dawidwojdyla.EmailManager;
 import it.dawidwojdyla.controller.AbstractController;
 import it.dawidwojdyla.controller.LoginWindowController;
 import it.dawidwojdyla.controller.MainWindowController;
+import it.dawidwojdyla.controller.OptionsWindowController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -31,6 +32,12 @@ public class ViewFactory {
     public void showMainWindow() {
 
         AbstractController controller = new MainWindowController(emailManager, this, "MainWindow.fxml");
+        initializeStage(controller);
+    }
+
+    public void showOptionsWindow() {
+
+        AbstractController controller = new OptionsWindowController(emailManager, this, "OptionsWindow.fxml");
         initializeStage(controller);
     }
 
