@@ -62,6 +62,7 @@ public class OptionsWindowController extends AbstractController implements Initi
         fontSizePicker.setShowTickMarks(true);
         fontSizePicker.setShowTickLabels(true);
         fontSizePicker.setLabelFormatter(new StringConverter<Double>() {
+
             @Override
             public String toString(Double aDouble) {
                 int i = aDouble.intValue();
@@ -76,7 +77,6 @@ public class OptionsWindowController extends AbstractController implements Initi
         fontSizePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
             fontSizePicker.setValue(newVal.intValue());
         });
-
     }
 
     private void setUpThemePicker() {
