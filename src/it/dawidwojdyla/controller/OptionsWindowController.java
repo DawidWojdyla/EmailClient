@@ -36,7 +36,8 @@ public class OptionsWindowController extends AbstractController implements Initi
 
         viewFactory.setColorTheme(themePicker.getValue());
         viewFactory.setFontSize(FontSize.values()[(int)(fontSizePicker.getValue())]);
-        viewFactory.closeStage((Stage) themePicker.getScene().getWindow());
+        viewFactory.updateStyles();
+        //viewFactory.closeStage((Stage) themePicker.getScene().getWindow());
     }
 
     @FXML
