@@ -8,7 +8,7 @@ import it.dawidwojdyla.view.ViewFactory;
  */
 public abstract class AbstractController {
 
-    private EmailManager emailManager;
+    protected EmailManager emailManager;
     protected ViewFactory viewFactory;
     private String fxmlName;
 

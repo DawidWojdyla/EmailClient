@@ -1,8 +1,9 @@
 package it.dawidwojdyla.controller;
 
 import it.dawidwojdyla.EmailManager;
+import it.dawidwojdyla.controller.servives.LoginService;
+import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.view.ViewFactory;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -29,14 +30,40 @@ public class LoginWindowController extends AbstractController {
 
     @FXML
     void loginButtonActon() {
-        System.out.println("loginButtonAction");
+        System.out.println("LoginButtonAction!");
 
-        //when login is successful (show main window and close login window)
-        viewFactory.showMainWindow();
+        if(fieldsAreValid()) {
+            EmailAccount emailAccount = new EmailAccount(emailAddressField.getText(), passwordField.getText());
+            LoginService loginService = new LoginService(emailAccount, emailManager);
+            EmailLoginResult emailLoginResult = loginService.login();
 
-        Stage stage = (Stage) errorLabel.getScene().getWindow();
-        viewFactory.closeStage(stage);
+            switch(emailLoginResult) {
+                case SUCCESS:
+                    System.out.println("Login succesfull! " + emailAccount);
+                    viewFactory.showMainWindow();
+                    Stage stage = (Stage) errorLabel.getScene().getWindow();
+                    viewFactory.closeStage(stage);
+                    return;
+                // rest of cases
+            }
 
+        }
+
+    }
+
+    private boolean fieldsAreValid() {
+
+        if(emailAddressField.getText().isEmpty()) {
+            errorLabel.setText("Please fill email");
+            return false;
+        }
+
+        if(passwordField.getText().isEmpty()) {
+            errorLabel.setText("Please fill password");
+            return false;
+        }
+
+        return true;
 
     }
 }
