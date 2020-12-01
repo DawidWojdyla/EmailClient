@@ -3,13 +3,15 @@ package it.dawidwojdyla.controller.servives;
 import it.dawidwojdyla.EmailManager;
 import it.dawidwojdyla.controller.EmailLoginResult;
 import it.dawidwojdyla.model.EmailAccount;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 
 import javax.mail.*;
 
 /**
  * Created by Dawid on 2020-12-01.
  */
-public class LoginService {
+public class LoginService extends Service<EmailLoginResult> {
 
     EmailAccount emailAccount;
     EmailManager emailManager;
@@ -19,7 +21,7 @@ public class LoginService {
         this.emailManager = emailManager;
     }
 
-    public EmailLoginResult login() {
+    private EmailLoginResult login() {
         Authenticator authenticator = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -28,6 +30,7 @@ public class LoginService {
         };
 
         try {
+            Thread.sleep(10000);
             Session session = Session.getInstance(emailAccount.getProperties(), authenticator);
             Store store = session.getStore("imaps");
             store.connect(emailAccount.getProperties().getProperty("incomingHost"),
@@ -51,5 +54,15 @@ public class LoginService {
 
         return EmailLoginResult.SUCCESS;
 
+    }
+
+    @Override
+    protected Task<EmailLoginResult> createTask() {
+        return new Task<EmailLoginResult>() {
+            @Override
+            protected EmailLoginResult call() throws Exception {
+                return login();
+            }
+        };
     }
 }
