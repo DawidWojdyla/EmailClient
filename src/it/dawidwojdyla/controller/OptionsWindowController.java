@@ -37,7 +37,6 @@ public class OptionsWindowController extends AbstractController implements Initi
         viewFactory.setColorTheme(themePicker.getValue());
         viewFactory.setFontSize(FontSize.values()[(int)(fontSizePicker.getValue())]);
         viewFactory.updateStyles();
-        //viewFactory.closeStage((Stage) themePicker.getScene().getWindow());
     }
 
     @FXML
@@ -50,7 +49,6 @@ public class OptionsWindowController extends AbstractController implements Initi
     public void initialize(URL url, ResourceBundle resourceBundle) {
         setUpThemePicker();
         setUpFontSizePicker();
-
     }
 
     private void setUpFontSizePicker() {

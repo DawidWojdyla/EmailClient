@@ -30,4 +30,9 @@ public class MainWindowController extends AbstractController {
         viewFactory.showOptionsWindow();
     }
 
+    @FXML
+    void addAccountAction() {
+        viewFactory.showLoginWindow();
+    }
+
 }
