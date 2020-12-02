@@ -45,7 +45,9 @@ public class LoginWindowController extends AbstractController implements Initial
                 switch(emailLoginResult) {
                     case SUCCESS:
                         System.out.println("Login succesfull! " + emailAccount);
-                        viewFactory.showMainWindow();
+                        if(!viewFactory.isMainViewInitialized()) {
+                            viewFactory.showMainWindow();
+                        }
                         Stage stage = (Stage) errorLabel.getScene().getWindow();
                         viewFactory.closeStage(stage);
                         return;
