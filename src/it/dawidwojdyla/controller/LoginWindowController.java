@@ -5,15 +5,19 @@ import it.dawidwojdyla.controller.servives.LoginService;
 import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 /**
  * Created by Dawid on 2020-11-26.
  */
-public class LoginWindowController extends AbstractController {
+public class LoginWindowController extends AbstractController implements Initializable {
 
     @FXML
     private TextField emailAddressField;
@@ -45,14 +49,18 @@ public class LoginWindowController extends AbstractController {
                         Stage stage = (Stage) errorLabel.getScene().getWindow();
                         viewFactory.closeStage(stage);
                         return;
-                    // rest of cases
+                    case FAILED_BY_CREDENTIALS:
+                        errorLabel.setText("Invalid credencials!");
+                        return;
+                    case FAILED_BY_UNEXPECTED_ERROR:
+                        errorLabel.setText("Unexpected error!");
+                        return;
+                    default:
+                        return;
                 }
 
             });
-
-
         }
-
     }
 
     private boolean fieldsAreValid() {
@@ -69,5 +77,11 @@ public class LoginWindowController extends AbstractController {
 
         return true;
 
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        emailAddressField.setText("dawidmailtest@gmail.com");
+        passwordField.setText("Dawidmailtest123haslo");
     }
 }
