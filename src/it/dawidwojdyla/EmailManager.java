@@ -18,6 +18,10 @@ public class EmailManager {
     public void addEmailAccount(EmailAccount emailAccount) {
         TreeItem<String> treeItem = new TreeItem<String>(emailAccount.getAddress());
         treeItem.setExpanded(true);
+            treeItem.getChildren().add(new TreeItem<String>("Inbox"));
+            treeItem.getChildren().add(new TreeItem<String>("Sent"));
+            treeItem.getChildren().add(new TreeItem<String>("Folder1"));
+            treeItem.getChildren().add(new TreeItem<String>("Spam"));
         foldersRoot.getChildren().add(treeItem);
 
     }
