@@ -1,7 +1,7 @@
 package it.dawidwojdyla.controller;
 
 import it.dawidwojdyla.EmailManager;
-import it.dawidwojdyla.controller.servives.LoginService;
+import it.dawidwojdyla.controller.services.LoginService;
 import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.fxml.FXML;

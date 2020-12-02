@@ -1,4 +1,4 @@
-package it.dawidwojdyla.controller.servives;
+package it.dawidwojdyla.controller.services;
 
 import it.dawidwojdyla.EmailManager;
 import it.dawidwojdyla.controller.EmailLoginResult;
