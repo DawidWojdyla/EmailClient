@@ -9,12 +9,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.web.WebView;
+import javafx.util.Callback;
 
 import java.net.URL;
 import java.util.Date;
@@ -69,6 +67,28 @@ public class MainWindowController extends AbstractController implements Initiali
         setUpEmailsTreeView();
         setUpEmailsTableView();
         setUpFolderSelection();
+        setUpBoldRows();
+    }
+
+    private void setUpBoldRows() {
+        emailsTableView.setRowFactory(new Callback<TableView<EmailMessage>, TableRow<EmailMessage>>() {
+            @Override
+            public TableRow<EmailMessage> call(TableView<EmailMessage> param) {
+                return new TableRow<EmailMessage>() {
+                    @Override
+                    protected void updateItem(EmailMessage item, boolean empty) {
+                         super.updateItem(item, empty);
+                         if(item != null) {
+                             if(item.isRead()) {
+                                 setStyle("");
+                             } else {
+                                 setStyle("-fx-font-weight: bold");
+                             }
+                         }
+                    }
+                };
+            }
+        });
     }
 
     private void setUpFolderSelection() {
