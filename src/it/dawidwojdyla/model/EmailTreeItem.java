@@ -16,11 +16,13 @@ public class EmailTreeItem<String> extends TreeItem<String> {
 
     private String name;
     private ObservableList<EmailMessage> emailMessages;
+    private int unreadMessagesCount;
 
     public EmailTreeItem(String name) {
         super(name);
         this.name = name;
         this.emailMessages = FXCollections.observableArrayList();
+
     }
 
     public void addEmail(Message message) throws MessagingException {
@@ -32,9 +34,25 @@ public class EmailTreeItem<String> extends TreeItem<String> {
                 message.getSize(),
                 message.getSentDate(),
                 messageIsRead,
-                message );
+                message);
         emailMessages.add(emailMessage);
+        if(!messageIsRead) {
+            incrementUnreadMessagesCount();
+        }
         //to check if it works
         System.out.println("added to " + name + " " + message.getSubject());
+    }
+
+    public void incrementUnreadMessagesCount() {
+        unreadMessagesCount++;
+        updateName();
+    }
+
+    private void updateName() {
+        if(unreadMessagesCount > 0) {
+            this.setValue((String)(name + "(" + unreadMessagesCount + ")"));
+        } else {
+            this.setValue(name);
+        }
     }
 }
