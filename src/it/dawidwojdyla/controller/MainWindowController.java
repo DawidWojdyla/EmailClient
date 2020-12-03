@@ -3,6 +3,7 @@ package it.dawidwojdyla.controller;
 import it.dawidwojdyla.EmailManager;
 import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.model.EmailTreeItem;
+import it.dawidwojdyla.model.SizeInteger;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
@@ -42,7 +43,7 @@ public class MainWindowController extends AbstractController implements Initiali
     private TableColumn<EmailMessage, String> recipientColumn;
 
     @FXML
-    private TableColumn<EmailMessage, Integer> sizeColumn;
+    private TableColumn<EmailMessage, SizeInteger> sizeColumn;
 
     @FXML
     private TableColumn<EmailMessage, Date> dateColumn;
@@ -104,7 +105,7 @@ public class MainWindowController extends AbstractController implements Initiali
         senderColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("sender"));
         subjectColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("subject"));
         recipientColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("recipient"));
-        sizeColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, Integer>("size"));
+        sizeColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, SizeInteger>("size"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, Date>("date"));
     }
 
