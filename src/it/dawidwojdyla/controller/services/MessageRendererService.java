@@ -16,13 +16,13 @@ import java.io.IOException;
 /**
  * Created by Dawid on 2020-12-03.
  */
-public class MessageRendererSerive extends Service {
+public class MessageRendererService extends Service {
 
     private EmailMessage emailMessage;
     private WebEngine webEngine;
     private StringBuffer stringBuffer;
 
-    public MessageRendererSerive(WebEngine webEngine) {
+    public MessageRendererService(WebEngine webEngine) {
         this.webEngine = webEngine;
         this.stringBuffer = new StringBuffer();
         this.setOnSucceeded(event -> displayMessage());
@@ -67,7 +67,6 @@ public class MessageRendererSerive extends Service {
                 }
             }
         }
-
     }
 
     private boolean isSimpleType(String contentType) {

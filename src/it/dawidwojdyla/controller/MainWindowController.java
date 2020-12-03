@@ -1,14 +1,11 @@
 package it.dawidwojdyla.controller;
 
 import it.dawidwojdyla.EmailManager;
-import it.dawidwojdyla.controller.services.MessageRendererSerive;
+import it.dawidwojdyla.controller.services.MessageRendererService;
 import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.model.EmailTreeItem;
 import it.dawidwojdyla.model.SizeInteger;
 import it.dawidwojdyla.view.ViewFactory;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -49,7 +46,7 @@ public class MainWindowController extends AbstractController implements Initiali
     @FXML
     private WebView emailWebView;
 
-    private MessageRendererSerive messageRendererSerive;
+    private MessageRendererService messageRendererService;
 
     public MainWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
         super(emailManager, viewFactory, fxmlName);
@@ -79,14 +76,14 @@ public class MainWindowController extends AbstractController implements Initiali
         emailsTableView.setOnMouseClicked(event -> {
             EmailMessage emailMessage = emailsTableView.getSelectionModel().getSelectedItem();
             if (emailMessage != null) {
-                messageRendererSerive.setEmailMessage(emailMessage);
-                messageRendererSerive.restart();
+                messageRendererService.setEmailMessage(emailMessage);
+                messageRendererService.restart();
             }
         });
     }
 
     private void setUpMessageRendererService() {
-        messageRendererSerive = new MessageRendererSerive(emailWebView.getEngine());
+        messageRendererService = new MessageRendererService(emailWebView.getEngine());
     }
 
     private void setUpBoldRows() {
