@@ -3,7 +3,7 @@ package it.dawidwojdyla.model;
 /**
  * Created by Dawid on 2020-12-03.
  */
-public class SizeInteger {
+public class SizeInteger implements Comparable<SizeInteger> {
 
     private int size;
 
@@ -21,6 +21,17 @@ public class SizeInteger {
             return size / 1024 + " KB";
         } else {
             return size / 1048576 + " MB";
+        }
+    }
+
+    @Override
+    public int compareTo(SizeInteger o) {
+        if (size > o.size) {
+            return 1;
+        } else if (size == o.size) {
+            return 0;
+        } else {
+            return -1;
         }
     }
 }
