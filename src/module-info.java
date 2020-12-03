@@ -10,5 +10,6 @@ module JavaFxMailClient {
     opens it.dawidwojdyla;
     opens it.dawidwojdyla.view;
     opens it.dawidwojdyla.controller;
+    opens it.dawidwojdyla.model;
 
 }

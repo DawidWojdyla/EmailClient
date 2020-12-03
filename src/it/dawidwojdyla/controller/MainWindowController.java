@@ -1,14 +1,23 @@
 package it.dawidwojdyla.controller;
 
 import it.dawidwojdyla.EmailManager;
+import it.dawidwojdyla.model.EmailMessage;
+import it.dawidwojdyla.model.EmailTreeItem;
 import it.dawidwojdyla.view.ViewFactory;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.web.WebView;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 /**
@@ -20,10 +29,26 @@ public class MainWindowController extends AbstractController implements Initiali
     private TreeView<String> emailsTreeView;
 
     @FXML
-    private TableView<?> emailsTableView;
+    private TableView<EmailMessage> emailsTableView;
 
     @FXML
     private WebView emailWebView;
+
+    @FXML
+    private TableColumn<EmailMessage, String> senderColumn;
+
+    @FXML
+    private TableColumn<EmailMessage, String> subjectColumn;
+
+    @FXML
+    private TableColumn<EmailMessage, String> recipientColumn;
+
+    @FXML
+    private TableColumn<EmailMessage, Integer> sizeColumn;
+
+    @FXML
+    private TableColumn<EmailMessage, Date> dateColumn;
+
 
     public MainWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
         super(emailManager, viewFactory, fxmlName);
@@ -42,6 +67,25 @@ public class MainWindowController extends AbstractController implements Initiali
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setUpEmailsTreeView();
+        setUpEmailsTableView();
+        setUpFolderSelection();
+    }
+
+    private void setUpFolderSelection() {
+        emailsTreeView.setOnMouseClicked(event -> {
+            EmailTreeItem<String> item = (EmailTreeItem<String>) emailsTreeView.getSelectionModel().getSelectedItem();
+            if (item != null) {
+                emailsTableView.setItems(item.getEmailMessages());
+            }
+        });
+    }
+
+    private void setUpEmailsTableView() {
+        senderColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("sender"));
+        subjectColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("subject"));
+        recipientColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("recipient"));
+        sizeColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, Integer>("size"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, Date>("date"));
     }
 
     private void setUpEmailsTreeView() {
