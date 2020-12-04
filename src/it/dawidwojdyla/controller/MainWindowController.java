@@ -22,6 +22,9 @@ import java.util.ResourceBundle;
  */
 public class MainWindowController extends AbstractController implements Initializable {
 
+    private MenuItem markUnreadMenuItem = new MenuItem("mark as unread");
+    private MenuItem deleteMessageMenuItem  = new MenuItem("delete message");
+
     @FXML
     private TreeView<String> emailsTreeView;
 
@@ -128,6 +131,8 @@ public class MainWindowController extends AbstractController implements Initiali
         recipientColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("recipient"));
         sizeColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, SizeInteger>("size"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, Date>("date"));
+
+        emailsTableView.setContextMenu(new ContextMenu(markUnreadMenuItem, deleteMessageMenuItem));
     }
 
     private void setUpEmailsTreeView() {
