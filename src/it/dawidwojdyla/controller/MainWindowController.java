@@ -6,6 +6,8 @@ import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.model.EmailTreeItem;
 import it.dawidwojdyla.model.SizeInteger;
 import it.dawidwojdyla.view.ViewFactory;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -73,6 +75,23 @@ public class MainWindowController extends AbstractController implements Initiali
         setUpBoldRows();
         setUpMessageRendererService();
         setUpMessageSelection();
+        setUpContextMenus();
+    }
+
+    private void setUpContextMenus() {
+        markUnreadMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                emailManager.setUnread();
+            }
+        });
+        deleteMessageMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                emailManager.deleteSelectedMessage();
+                emailWebView.getEngine().loadContent("");
+            }
+        });
     }
 
     private void setUpMessageSelection() {
