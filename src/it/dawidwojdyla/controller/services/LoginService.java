@@ -39,7 +39,7 @@ public class LoginService extends Service<EmailLoginResult> {
             emailManager.addEmailAccount(emailAccount);
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
-            return EmailLoginResult.FAILDE_BY_NETWORK;
+            return EmailLoginResult.FAILED_BY_NETWORK;
         } catch (AuthenticationFailedException e) {
             e.printStackTrace();
             return EmailLoginResult.FAILED_BY_CREDENTIALS;

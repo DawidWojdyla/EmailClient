@@ -6,6 +6,6 @@ package it.dawidwojdyla.controller;
 public enum EmailLoginResult {
     SUCCESS,
     FAILED_BY_CREDENTIALS,
-    FAILDE_BY_NETWORK,
+    FAILED_BY_NETWORK,
     FAILED_BY_UNEXPECTED_ERROR;
 }
