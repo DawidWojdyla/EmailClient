@@ -1,10 +1,7 @@
 package it.dawidwojdyla.view;
 
 import it.dawidwojdyla.EmailManager;
-import it.dawidwojdyla.controller.AbstractController;
-import it.dawidwojdyla.controller.LoginWindowController;
-import it.dawidwojdyla.controller.MainWindowController;
-import it.dawidwojdyla.controller.OptionsWindowController;
+import it.dawidwojdyla.controller.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -67,6 +64,11 @@ public class ViewFactory {
     public void showOptionsWindow() {
 
         AbstractController controller = new OptionsWindowController(emailManager, this, "OptionsWindow.fxml");
+        initializeStage(controller);
+    }
+
+    public void showComposeMessageWindow() {
+        AbstractController controller = new ComposeMessageWindowController(emailManager, this, "ComposeMessageWindow.fxml");
         initializeStage(controller);
     }
 
