@@ -34,7 +34,6 @@ public class LoginWindowController extends AbstractController implements Initial
 
     @FXML
     void loginButtonActon() {
-        System.out.println("LoginButtonAction!");
 
         if(fieldsAreValid()) {
             EmailAccount emailAccount = new EmailAccount(emailAddressField.getText(), passwordField.getText());

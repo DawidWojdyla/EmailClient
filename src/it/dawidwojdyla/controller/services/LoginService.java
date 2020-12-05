@@ -37,6 +37,7 @@ public class LoginService extends Service<EmailLoginResult> {
                     emailAccount.getPassword());
             emailAccount.setStore(store);
             emailManager.addEmailAccount(emailAccount);
+            emailAccount.setSession(session);
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
             return EmailLoginResult.FAILED_BY_NETWORK;
@@ -50,9 +51,7 @@ public class LoginService extends Service<EmailLoginResult> {
             e.printStackTrace();
             return EmailLoginResult.FAILED_BY_UNEXPECTED_ERROR;
         }
-
         return EmailLoginResult.SUCCESS;
-
     }
 
     @Override

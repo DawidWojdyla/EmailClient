@@ -1,5 +1,6 @@
 package it.dawidwojdyla.model;
 
+import javax.mail.Session;
 import javax.mail.Store;
 import java.util.Properties;
 
@@ -12,6 +13,15 @@ public class EmailAccount {
     private String password;
     private Properties properties;
     private Store store;
+    private Session session;
+
+    public Session getSession() {
+        return session;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
+    }
 
     public EmailAccount(String address, String password) {
         this.address = address;
@@ -23,7 +33,7 @@ public class EmailAccount {
         properties.put("mail.transport.protocol", "smtps");
         properties.put("mail.smtps.host", "smtp.gmail.com");
         properties.put("mail.smtps.auth", "true");
-        properties.put("outgoinghost", "smtp.gmsil.com");
+        properties.put("outgoingHost", "smtp.gmail.com");
     }
 
     public String getAddress() {
