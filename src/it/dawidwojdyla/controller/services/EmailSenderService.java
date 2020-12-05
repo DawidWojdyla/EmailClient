@@ -1,5 +1,6 @@
 package it.dawidwojdyla.controller.services;
 
+import it.dawidwojdyla.controller.EmailSendingResult;
 import it.dawidwojdyla.model.EmailAccount;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -7,7 +8,7 @@ import javafx.concurrent.Task;
 /**
  * Created by Dawid on 2020-12-05.
  */
-public class EmailSenderService extends Service {
+public class EmailSenderService extends Service<EmailSendingResult> {
 
     private EmailAccount emailAccount;
     private String subject;
