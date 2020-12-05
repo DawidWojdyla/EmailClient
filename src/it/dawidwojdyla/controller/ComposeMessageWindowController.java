@@ -1,9 +1,11 @@
 package it.dawidwojdyla.controller;
 
 import it.dawidwojdyla.EmailManager;
+import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.web.HTMLEditor;
@@ -28,9 +30,13 @@ public class ComposeMessageWindowController extends AbstractController implement
     @FXML
     private Label errorLabel;
 
+    @FXML
+    private ChoiceBox<EmailAccount> emailAccountChoiceBox;
+
     public ComposeMessageWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
         super(emailManager, viewFactory, fxmlName);
     }
+
 
     @FXML
     void sendButtonAction() {
@@ -40,6 +46,7 @@ public class ComposeMessageWindowController extends AbstractController implement
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        emailAccountChoiceBox.setItems(emailManager.getEmailAccounts());
+        emailAccountChoiceBox.setValue(emailManager.getEmailAccounts().get(0));
     }
 }
