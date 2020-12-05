@@ -89,6 +89,7 @@ public class MainWindowController extends AbstractController implements Initiali
             @Override
             public void handle(ActionEvent event) {
                 emailManager.setUnread();
+                emailsTableView.refresh();
             }
         });
         deleteMessageMenuItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -108,6 +109,7 @@ public class MainWindowController extends AbstractController implements Initiali
                 if(!emailMessage.isRead()) {
                     emailManager.setRead();
                 }
+                emailsTableView.refresh();
                 messageRendererService.setEmailMessage(emailMessage);
                 messageRendererService.restart();
 
