@@ -10,7 +10,6 @@ import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.search.BodyTerm;
 import java.io.IOException;
 
 /**
@@ -26,6 +25,9 @@ public class MessageRendererService extends Service {
         this.webEngine = webEngine;
         this.stringBuffer = new StringBuffer();
         this.setOnSucceeded(event -> displayMessage());
+    }
+
+    public MessageRendererService(BodyPart bodyPart, StringBuffer stringBuffer) {
     }
 
     public void setEmailMessage(EmailMessage emailMessage) {
@@ -59,12 +61,19 @@ public class MessageRendererService extends Service {
             stringBuffer.append(message.getContent().toString());
         } else if (isMultipartType(contentType)) {
             Multipart multipart = (Multipart) message.getContent();
-            for(int i = multipart.getCount()-1; i >= 0; i--) {
-                BodyPart bodyPart = multipart.getBodyPart(i);
-                String bodyPartContentType = bodyPart.getContentType();
-                if(isSimpleType(bodyPartContentType)) {
-                    stringBuffer.append(bodyPart.getContent().toString());
-                }
+            loadMultipart(multipart, stringBuffer);
+        }
+    }
+
+    private void loadMultipart(Multipart multipart, StringBuffer stringBuffer) throws IOException, MessagingException {
+        for(int i = multipart.getCount()-1; i >= 0; i--) {
+            BodyPart bodyPart = multipart.getBodyPart(i);
+            String bodyPartContentType = bodyPart.getContentType();
+            if(isSimpleType(bodyPartContentType)) {
+                stringBuffer.append(bodyPart.getContent().toString());
+            } else if (isMultipartType(bodyPartContentType)) {
+                Multipart multipart2 = (Multipart) bodyPart.getContent();
+                loadMultipart(multipart2, stringBuffer);
             }
         }
     }
