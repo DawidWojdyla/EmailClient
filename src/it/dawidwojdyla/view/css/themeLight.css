@@ -1,36 +1,169 @@
-*{
-    -fx-background-color: #c5d6d9;
+/*Theme base colors:*/
+* {
+    backgroundColor: #c5d6d9;
+    backgroundColorAlt: #9bbec4;
+    fontColor: #394345;
+    fontColorHighlighted: #394345;
+	defaultElementColor: #b2ccd1;
+	errorTextFill: #690f0f;
 }
 
-.root {
-    mainColor: #b2ccd1;
+.container{
+    -fx-background-color: backgroundColor;
+}
+.errorText{
+    -fx-text-fill: errorTextFill;
+    -fx-font-weight: bold;
+    -fx-font-size: 13pt;
 }
 
-.big {
+.big{
    -fx-font-size: 16pt;
 }
-
-Button, Label, ChoiceBox, Slider {
-    -fx-text-fill: #394345;
+Button, Label, ChoiceBox, Slider, TextField, .menu-button{
+    -fx-text-fill: fontColor;
 }
 Button {
-    -fx-background-color: mainColor;
+    -fx-background-color: defaultElementColor;
 }
 Button:hover {
-    -fx-background-color: #9bbec4;
+    -fx-background-color: backgroundColorAlt;
 }
-ChoiceBox > *{
-    -fx-background-color: mainColor;
+ChoiceBox >* {
+    -fx-background-color: defaultElementColor;
 }
 Slider .axis {
-    -fx-tick-label-fill: white;
+    -fx-tick-label-fill: fontColor;
 }
-Slider .track {
-    -fx-background-color: mainColor;
+Slider .track{
+    -fx-background-color: defaultElementColor;
 }
-Slider .track:hover {
-    -fx-background-color: #9bbec4;
+Slider .track:hover{
+    -fx-background-color: backgroundColorAlt;
 }
-Slider .thumb {
-    -fx-background-color: #657d6e;
+Slider .thumb{
+    -fx-background-color: #85939e;
 }
+.text-field {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-text-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 3, 2, 2;
+    -fx-padding: 0.25em 0.416667em  0.333333em 0.416667em; /* 3 5 4 5 */
+    -fx-prompt-text-fill: derive(-fx-control-inner-background,-30%);
+    -fx-cursor: text;
+    -fx-control-inner-background: defaultElementColor;
+}
+
+.text-field:focused {
+    -fx-background-color: -fx-focus-color, -fx-text-box-border, -fx-control-inner-background;
+    -fx-background-insets: -0.4, 1, 2;
+    -fx-background-radius: 3.4, 2, 2;
+    -fx-prompt-text-fill: transparent;
+}
+/*Table view:*/
+.table-view{
+   -fx-background-color: backgroundColor;
+}
+
+.table-view:focused{
+    -fx-background-color: backgroundColor;
+}
+.table-view .column-header-background,
+.table-view .column-header-background .filler {
+    -fx-background-color: linear-gradient(#c5d6d9 0%, #a0b4b8 100%);
+}
+.table-view .column-header-background .label{
+    -fx-background-color: transparent;
+    -fx-text-fill: fontColor;
+}
+.table-view .column-header {
+    -fx-background-color: transparent;
+}
+.table-view .table-cell{
+    -fx-text-fill: fontColor;
+}
+.table-row-cell{
+    -fx-background-color: #a0b4b8;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em; /* 0 */
+    -fx-table-cell-border-color: #a2b0b3;
+    -fx-border-color: #a2b0b3;
+}
+.table-row-cell:odd{
+    -fx-background-color: -fx-table-cell-border-color, #c5d6d9;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em; /* 0 */
+}
+.table-row-cell:selected {
+    -fx-background-color: #708b91;
+    -fx-background-insets: 0;
+    -fx-background-radius: 1;
+}
+/*Tree view:*/
+.tree-cell{
+    -fx-background-color: backgroundColor;
+    -fx-text-fill: fontColor;
+ }
+.tree-cell > .tree-disclosure-node > .arrow  {
+     -fx-background-color: fontColor;
+ }
+.tree-cell:expanded > .tree-disclosure-node > .arrow {
+     -fx-background-color: grey;
+ }
+.scroll-bar > .increment-button,
+.scroll-bar > .decrement-button {
+     -fx-padding: 0.15em;
+
+ }
+.scroll-bar .thumb {
+     -fx-background-color: #708b91;
+ }
+.scroll-bar{
+      -fx-background-color: #c5d6d9;
+}
+
+/*menus and menu items:*/
+.menu-bar {
+    -fx-background-color: backgroundColor;
+}
+
+.menu-bar > .container > .menu-button {
+    -fx-background-color: backgroundColor;
+}
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-text-fill: fontColor;
+}
+
+.menu-bar > .container > .menu-button > .label:disabled {
+    -fx-opacity: 1.0;
+}
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:focused,
+.menu-bar > .container > .menu-button:showing {
+    -fx-background-color: backgroundColorAlt;
+}
+.menu-bar > .container > .menu-button:hover > .label,
+.menu-bar > .container > .menu-button:focused > .label,
+.menu-bar > .container > .menu-button:showing > .label {
+    -fx-text-fill: fontColorHighlighted;
+}
+.menu-item {
+    -fx-background-color: backgroundColor;
+}
+.menu-item .label {
+    -fx-text-fill: fontColor;
+}
+.menu-item .label:disabled {
+    -fx-opacity: 1.0;
+}
+.menu-item:focused, .menu-item:hovered {
+    -fx-background-color: backgroundColorAlt;
+}
+.menu-item:focused .label, .menu-item:hovered .label {
+    -fx-text-fill: fontColorHighlighted;
+}
+.context-menu {
+    -fx-background-color: backgroundColor;
+}
+
