@@ -10,7 +10,7 @@
       <Label layoutX="20.0" layoutY="24.0" prefHeight="25.0" prefWidth="85.0" text="Subject" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" />
       <Label layoutX="14.0" layoutY="55.0" prefHeight="25.0" prefWidth="85.0" text="Sender" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="50.0" />
       <Label fx:id="attachmentLabel" layoutX="14.0" layoutY="79.0" prefHeight="25.0" prefWidth="85.0" text="Attachments:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="80.0" />
-      <WebView fx:id="webView" layoutX="14.0" layoutY="149.0" prefHeight="429.0" prefWidth="575.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="150.0" />
+      <WebView fx:id="webView" layoutX="14.0" layoutY="115.0" prefHeight="463.0" prefWidth="575.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="120.0" />
       <Label fx:id="subjectLabel" layoutX="120.0" layoutY="23.0" prefHeight="20.0" prefWidth="475.0" AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
       <Label fx:id="senderLabel" layoutX="120.0" layoutY="53.0" prefHeight="20.0" prefWidth="475.0" AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="50.0" />
       <HBox fx:id="hBoxDownloads" layoutX="134.0" layoutY="83.0" prefHeight="30.0" prefWidth="475.0" AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="80.0" />

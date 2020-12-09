@@ -1,7 +1,10 @@
 package it.dawidwojdyla.controller;
 
 import it.dawidwojdyla.EmailManager;
+import it.dawidwojdyla.controller.services.MessageRendererService;
+import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.view.ViewFactory;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -38,6 +41,20 @@ public class EmailDetailsWindowController extends AbstractController implements 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        EmailMessage emailMessage = emailManager.getSelectedMessage();
+        subjectLabel.setText(emailMessage.getSubject());
+        senderLabel.setText(emailMessage.getSender());
+
+        if(emailMessage.hasAttachment()) {
+            //hBoxDownloads
+        } else {
+            attachmentLabel.setVisible(false);
+        }
+        MessageRendererService messageRendererService = new MessageRendererService(webView.getEngine());
+        messageRendererService.setEmailMessage(emailMessage);
+        messageRendererService.restart();
+
 
     }
 }
