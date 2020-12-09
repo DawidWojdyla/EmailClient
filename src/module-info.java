@@ -6,6 +6,7 @@ module JavaFxMailClient {
     requires javafx.fxml;
     requires activation;
     requires java.mail;
+    requires java.desktop;
 
     opens it.dawidwojdyla;
     opens it.dawidwojdyla.view;

@@ -48,7 +48,7 @@ public class FetchFoldersService extends Service<Void> {
     private void handleFolders(Folder[] folders, EmailTreeItem<String> foldersRoot) throws MessagingException {
         for(Folder folder: folders) {
             folderList.add(folder);
-            EmailTreeItem<String> emailTreeItem = new EmailTreeItem<String>(folder.getName());
+            EmailTreeItem<String> emailTreeItem = new EmailTreeItem<>(folder.getName());
             emailTreeItem.setGraphic(iconResolver.getIconForFolder(folder.getName()));
             foldersRoot.getChildren().add(emailTreeItem);
             foldersRoot.setExpanded(true);

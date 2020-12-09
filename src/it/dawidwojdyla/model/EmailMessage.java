@@ -1,6 +1,5 @@
 package it.dawidwojdyla.model;
 
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -23,7 +22,8 @@ public class EmailMessage {
     private SimpleObjectProperty<Date> date;
     private boolean isRead;
     private Message message;
-    private List<MimeBodyPart> attachmentList = new ArrayList<MimeBodyPart>();
+
+    private List<MimeBodyPart> attachmentList = new ArrayList<>();
 
     private boolean hasAttachment = false;
 
@@ -73,14 +73,14 @@ public class EmailMessage {
         return hasAttachment;
     }
 
+    public List<MimeBodyPart> getAttachmentList() {
+        return attachmentList;
+    }
+
     public void addAttachment(MimeBodyPart mimeBodyPart) {
         hasAttachment = true;
-        attachmentList.add(mimeBodyPart);
-        try {
-            System.out.println("Added attachment: " + mimeBodyPart.getFileName());
-        } catch (MessagingException e) {
-            e.printStackTrace();
+        if(!attachmentList.contains(mimeBodyPart)) {
+            attachmentList.add(mimeBodyPart);
         }
-
     }
 }
