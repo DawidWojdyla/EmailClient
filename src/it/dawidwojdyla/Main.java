@@ -2,6 +2,7 @@ package it.dawidwojdyla;
 
 import it.dawidwojdyla.controller.persistence.PersistenceAccess;
 import it.dawidwojdyla.controller.persistence.ValidAccount;
+import it.dawidwojdyla.controller.services.LoginService;
 import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.application.Application;
@@ -25,8 +26,17 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
 
         ViewFactory viewFactory = new ViewFactory(emailManager);
-        viewFactory.showLoginWindow();
-        viewFactory.updateStyles();
+        List<ValidAccount> validAccounts = persistenceAccess.loadFromPersistence();
+        if (validAccounts.isEmpty()) {
+            viewFactory.showLoginWindow();
+        } else {
+            for (ValidAccount account : validAccounts) {
+                EmailAccount emailAccount = new EmailAccount(account.getAddress(), account.getPassword());
+                LoginService loginService = new LoginService(emailAccount, emailManager);
+                loginService.start();
+            }
+            viewFactory.showMainWindow();
+        }
     }
 
     @Override
