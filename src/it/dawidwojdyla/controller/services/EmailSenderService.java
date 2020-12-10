@@ -5,10 +5,17 @@ import it.dawidwojdyla.model.EmailAccount;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * Created by Dawid on 2020-12-05.
@@ -19,13 +26,15 @@ public class EmailSenderService extends Service<EmailSendingResult> {
     private String subject;
     private String recipient;
     private String messageContent;
+    private List<File> attachments;
 
 
-    public EmailSenderService(EmailAccount emailAccount, String subject, String recipient, String messageContent) {
+    public EmailSenderService(EmailAccount emailAccount, String subject, String recipient, String messageContent, List<File> attachments) {
         this.emailAccount = emailAccount;
         this.subject = subject;
         this.recipient = recipient;
         this.messageContent = messageContent;
+        this.attachments = attachments;
     }
 
     @Override
@@ -44,6 +53,7 @@ public class EmailSenderService extends Service<EmailSendingResult> {
                     BodyPart messageBodyPart = new MimeBodyPart();
                     messageBodyPart.setContent(messageContent, "text/html");
                     multipart.addBodyPart(messageBodyPart);
+                    addAttachments(multipart);
                     mimeMessage.setContent(multipart);
                     //sending the message:
                     Transport transport = emailAccount.getSession().getTransport();
@@ -58,6 +68,18 @@ public class EmailSenderService extends Service<EmailSendingResult> {
                     return EmailSendingResult.FAILED_BY_UNEXPECTED_ERROR;
                 }
                 return EmailSendingResult.SUCCESS;
+            }
+
+            private void addAttachments(Multipart multipart) throws MessagingException {
+                for (File attachment: attachments) {
+                    if(attachment.exists()) {
+                        BodyPart attachmentBodyPart = new MimeBodyPart();
+                        DataSource dataSource = new FileDataSource(attachment.getAbsolutePath());
+                        attachmentBodyPart.setDataHandler(new DataHandler(dataSource));
+                        attachmentBodyPart.setFileName(attachment.getName());
+                        multipart.addBodyPart(attachmentBodyPart);
+                    }
+                }
             }
         };
     }
