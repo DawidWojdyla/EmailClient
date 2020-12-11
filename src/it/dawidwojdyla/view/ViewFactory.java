@@ -15,13 +15,13 @@ import java.util.ArrayList;
  */
 public class ViewFactory {
 
-    private EmailManager emailManager;
-    private ArrayList<Stage> activeStages;
+    private final EmailManager emailManager;
+    private final ArrayList<Stage> activeStages;
     private boolean mainViewInitialized = false;
 
     public ViewFactory(EmailManager emailManager) {
         this.emailManager = emailManager;
-        this.activeStages = new ArrayList<Stage>();
+        this.activeStages = new ArrayList<>();
     }
 
     public boolean isMainViewInitialized() {

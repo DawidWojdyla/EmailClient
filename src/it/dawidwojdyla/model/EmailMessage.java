@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import java.util.ArrayList;
 import java.util.Date;

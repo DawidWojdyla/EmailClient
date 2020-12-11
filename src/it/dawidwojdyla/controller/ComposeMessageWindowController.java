@@ -6,13 +6,16 @@ import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import java.io.File;
 import java.net.URL;
@@ -40,7 +43,11 @@ public class ComposeMessageWindowController extends AbstractController implement
     private Label errorLabel;
 
     @FXML
+    private HBox attachHBox;
+
+    @FXML
     private ChoiceBox<EmailAccount> emailAccountChoiceBox;
+    private String fileName;
 
     public ComposeMessageWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
         super(emailManager, viewFactory, fxmlName);
@@ -78,9 +85,30 @@ public class ComposeMessageWindowController extends AbstractController implement
     void attachButtonAction() {
         FileChooser fileChooser = new FileChooser();
         File selectedFile = fileChooser.showOpenDialog(null);
-        if (selectedFile != null) {
-            attachments.add(selectedFile);
+        if (selectedFile != null && !attachments.contains(selectedFile)) {
+            addAttachment(selectedFile);
         }
+    }
+
+    private void addAttachment(File selectedFile) {
+        attachments.add(selectedFile);
+
+        TextFlow textFlow = new TextFlow();
+
+        Text closingSign = new Text(" x ");
+        closingSign.setStyle("-fx-font-weight: bold; -fx-cursor: hand");
+        closingSign.setOnMouseClicked(e -> {
+            attachments.remove(selectedFile);
+            attachHBox.getChildren().remove(textFlow);
+        });
+
+        String fileName = selectedFile.getName();
+        if(fileName.length() > 20) {
+            fileName = fileName.substring(0, 17) + "...";
+        }
+
+        textFlow.getChildren().addAll(new Text(fileName), closingSign);
+        attachHBox.getChildren().add(textFlow);
     }
 
     @Override
