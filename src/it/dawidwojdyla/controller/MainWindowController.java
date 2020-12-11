@@ -64,6 +64,11 @@ public class MainWindowController extends AbstractController implements Initiali
     }
 
     @FXML
+    void aboutAction() {
+        viewFactory.showAboutWindow();
+    }
+
+    @FXML
     void addAccountAction() {
         viewFactory.showLoginWindow();
     }

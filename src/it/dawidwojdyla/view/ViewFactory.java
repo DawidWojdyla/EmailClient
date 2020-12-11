@@ -51,33 +51,38 @@ public class ViewFactory {
     public void showLoginWindow() {
 
         AbstractController controller = new LoginWindowController(emailManager, this, "loginWindow.fxml");
-        initializeStage(controller);
+        initializeStage(controller,false);
     }
 
     public void showMainWindow() {
 
         AbstractController controller = new MainWindowController(emailManager, this, "MainWindow.fxml");
-        initializeStage(controller);
+        initializeStage(controller, true);
         mainViewInitialized = true;
     }
 
     public void showOptionsWindow() {
 
         AbstractController controller = new OptionsWindowController(emailManager, this, "OptionsWindow.fxml");
-        initializeStage(controller);
+        initializeStage(controller, false);
+    }
+
+    public void showAboutWindow() {
+        AbstractController controller = new AboutWindowController(emailManager, this, "AboutWindow.fxml");
+        initializeStage(controller, false);
     }
 
     public void showComposeMessageWindow() {
         AbstractController controller = new ComposeMessageWindowController(emailManager, this, "ComposeMessageWindow.fxml");
-        initializeStage(controller);
+        initializeStage(controller,true);
     }
 
     public void showEmailDetailsWindow() {
         AbstractController controller = new EmailDetailsWindowController(emailManager, this, "EmailDetailsWindow.fxml");
-        initializeStage(controller);
+        initializeStage(controller,true);
     }
 
-    private void initializeStage(AbstractController controller) {
+    private void initializeStage(AbstractController controller, boolean resizable) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(controller.getFxmlName()));
         fxmlLoader.setController(controller);
         Parent parent;
@@ -91,6 +96,9 @@ public class ViewFactory {
         Scene scene = new Scene(parent);
         Stage stage = new Stage();
         stage.setScene(scene);
+        if(!resizable) {
+            stage.setResizable(false);
+        }
         stage.show();
         activeStages.add(stage);
     }
@@ -109,6 +117,4 @@ public class ViewFactory {
 
         }
     }
-
-
 }
