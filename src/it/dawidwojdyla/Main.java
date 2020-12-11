@@ -19,11 +19,11 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    private PersistenceAccess persistenceAccess = new PersistenceAccess();
-    private EmailManager emailManager = new EmailManager();
+    private final PersistenceAccess persistenceAccess = new PersistenceAccess();
+    private final EmailManager emailManager = new EmailManager();
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
 
         ViewFactory viewFactory = new ViewFactory(emailManager);
         List<ValidAccount> validAccounts = persistenceAccess.loadFromPersistence();
@@ -40,7 +40,7 @@ public class Main extends Application {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         List<ValidAccount> validAccounts = new ArrayList<>();
         for (EmailAccount emailAccount: emailManager.getEmailAccounts()) {
             validAccounts.add(new ValidAccount(emailAccount.getAddress(), emailAccount.getPassword()));
