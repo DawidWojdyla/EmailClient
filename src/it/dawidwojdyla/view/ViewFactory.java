@@ -72,10 +72,11 @@ public class ViewFactory {
         initializeStage(controller, false);
     }
 
-    public void showComposeMessageWindow() {
-        AbstractController controller = new ComposeMessageWindowController(emailManager, this, "ComposeMessageWindow.fxml");
+    public void showComposeMessageWindow(ComposeMessageType messageType) {
+        AbstractController controller = new ComposeMessageWindowController(emailManager, this, "ComposeMessageWindow.fxml", messageType);
         initializeStage(controller,true);
     }
+
 
     public void showEmailDetailsWindow() {
         AbstractController controller = new EmailDetailsWindowController(emailManager, this, "EmailDetailsWindow.fxml");
@@ -117,4 +118,5 @@ public class ViewFactory {
 
         }
     }
+
 }

@@ -6,8 +6,6 @@ import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.model.EmailTreeItem;
 import it.dawidwojdyla.model.SizeInteger;
 import it.dawidwojdyla.view.ViewFactory;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -27,6 +25,8 @@ public class MainWindowController extends AbstractController implements Initiali
     private MenuItem markUnreadMenuItem = new MenuItem("mark as unread");
     private MenuItem deleteMessageMenuItem  = new MenuItem("delete message");
     private MenuItem showMessageDetailsMenuItem = new MenuItem("view details");
+    private MenuItem showReplyMessageWindowMenuItem = new MenuItem("reply");
+    private MenuItem showForwardMessageWindowMenuItem = new MenuItem("forward");
 
     @FXML
     private TreeView<String> emailsTreeView;
@@ -75,8 +75,7 @@ public class MainWindowController extends AbstractController implements Initiali
 
     @FXML
     void composeMessageAction() {
-        viewFactory.showComposeMessageWindow();
-
+        viewFactory.showComposeMessageWindow(ComposeMessageType.DEFAULT);
     }
 
     @Override
@@ -91,15 +90,29 @@ public class MainWindowController extends AbstractController implements Initiali
     }
 
     private void setUpContextMenus() {
+
         markUnreadMenuItem.setOnAction(event -> {
             emailManager.setUnread();
             emailsTableView.refresh();
         });
+
         deleteMessageMenuItem.setOnAction(event -> {
             emailManager.deleteSelectedMessage();
             emailWebView.getEngine().loadContent("");
         });
+
         showMessageDetailsMenuItem.setOnAction(actionEvent -> viewFactory.showEmailDetailsWindow());
+
+        showReplyMessageWindowMenuItem.setOnAction(event -> {
+            viewFactory.showComposeMessageWindow(ComposeMessageType.REPLY);
+
+        });
+
+        showForwardMessageWindowMenuItem.setOnAction(event -> {
+            viewFactory.showComposeMessageWindow(ComposeMessageType.FORWARD);
+
+        });
+
     }
 
     private void setUpMessageSelection() {
@@ -160,7 +173,7 @@ public class MainWindowController extends AbstractController implements Initiali
         sizeColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, SizeInteger>("size"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, Date>("date"));
 
-        emailsTableView.setContextMenu(new ContextMenu(markUnreadMenuItem, deleteMessageMenuItem, showMessageDetailsMenuItem));
+        emailsTableView.setContextMenu(new ContextMenu(markUnreadMenuItem, deleteMessageMenuItem, showMessageDetailsMenuItem, showReplyMessageWindowMenuItem, showForwardMessageWindowMenuItem));
     }
 
     private void setUpEmailsTreeView() {

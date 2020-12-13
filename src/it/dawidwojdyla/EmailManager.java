@@ -92,4 +92,8 @@ public class EmailManager {
             e.printStackTrace();
         }
     }
+
+    public void setMessageContent() {
+
+    }
 }

@@ -6,7 +6,6 @@ import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -47,12 +46,13 @@ public class ComposeMessageWindowController extends AbstractController implement
 
     @FXML
     private ChoiceBox<EmailAccount> emailAccountChoiceBox;
-    private String fileName;
 
-    public ComposeMessageWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
+    private ComposeMessageType messageType;
+
+    public ComposeMessageWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName, ComposeMessageType messageType) {
         super(emailManager, viewFactory, fxmlName);
+        this.messageType = messageType;
     }
-
 
     @FXML
     void sendButtonAction() {
@@ -115,5 +115,11 @@ public class ComposeMessageWindowController extends AbstractController implement
     public void initialize(URL location, ResourceBundle resources) {
         emailAccountChoiceBox.setItems(emailManager.getEmailAccounts());
         emailAccountChoiceBox.setValue(emailManager.getEmailAccounts().get(0));
+
+        if (messageType == ComposeMessageType.REPLY) {
+            //set fo reply type
+        } else if (messageType == ComposeMessageType.FORWARD) {
+            //set for forward type
+        }
     }
 }
