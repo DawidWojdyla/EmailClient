@@ -3,6 +3,7 @@ package it.dawidwojdyla.controller;
 import it.dawidwojdyla.EmailManager;
 import it.dawidwojdyla.controller.services.EmailSenderService;
 import it.dawidwojdyla.model.EmailAccount;
+import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -16,6 +17,7 @@ import javafx.scene.web.HTMLEditor;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.mail.internet.MimeBodyPart;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -115,11 +117,54 @@ public class ComposeMessageWindowController extends AbstractController implement
     public void initialize(URL location, ResourceBundle resources) {
         emailAccountChoiceBox.setItems(emailManager.getEmailAccounts());
         emailAccountChoiceBox.setValue(emailManager.getEmailAccounts().get(0));
+        if (messageType != ComposeMessageType.DEFAULT) {
+            setMessageData();
+        }
+    }
+
+    private void setMessageData() {
+        EmailMessage message = emailManager.getSelectedMessage();
 
         if (messageType == ComposeMessageType.REPLY) {
-            //set fo reply type
-        } else if (messageType == ComposeMessageType.FORWARD) {
-            //set for forward type
+            subjectTextField.setText("Re: " + message.getSubject());
+            recipientTextField.setText(message.getSender());
+            htmlEditor.setHtmlText(prepareReplayHtmlText(message));
+
+        } else {
+            subjectTextField.setText("Fwd: " + message.getSubject());
+            htmlEditor.setHtmlText(prepareForwardHtmlText(message));
+
+            if (message.hasAttachment()) {
+                for (MimeBodyPart bodyPart : message.getAttachmentList()) {
+                    System.out.println("Adding attachments...");
+                }
+            }
         }
+    }
+
+    private String prepareReplayHtmlText(EmailMessage message) {
+        String htmlText = "<br><br>On " + message.getDate() + " - " + message.getRecipient() + " wrote:";
+        htmlText += prepareMessageContent(message);
+        return htmlText;
+    }
+
+
+    private String prepareForwardHtmlText(EmailMessage message) {
+        String htmlText = "<br><br>" +
+                "<table><tr><td colspan='2' style='text-align: center'>----- Forwarded message -----</td></tr>" +
+                "<tr><td>From:</td><td>" + message.getSender() + "</td></tr>" +
+                "<td>Date:</td><td>" + message.getDate() + "</td></tr>" +
+                "<td>Subject:</td><td>" + message.getSubject() + "</td></tr>" +
+                "<td>To:</td><td>" + message.getRecipient() + "</td></tr></table>";
+        htmlText += prepareMessageContent(message);
+
+        return htmlText;
+    }
+
+    private String prepareMessageContent(EmailMessage message) {
+        String messageContent = "<blockquote style='border-left: 0.5px solid gray; padding: 5px; margin-left: 10px;'>";
+        messageContent += "HERE WILL BE MESSAGE CONTENT";
+        messageContent += "</blockquote>";
+        return messageContent;
     }
 }
