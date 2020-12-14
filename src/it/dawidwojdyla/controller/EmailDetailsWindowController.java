@@ -61,10 +61,13 @@ public class EmailDetailsWindowController extends AbstractController implements 
             attachmentLabel.setVisible(false);
         }
 
-        MessageRendererService messageRendererService = new MessageRendererService(webView.getEngine());
-        messageRendererService.setEmailMessage(emailMessage);
-        messageRendererService.restart();
-
+        if (emailMessage.getMessageContent() == null) {
+            MessageRendererService messageRendererService = new MessageRendererService(webView.getEngine());
+            messageRendererService.setEmailMessage(emailMessage);
+            messageRendererService.restart();
+        } else {
+            webView.getEngine().loadContent(emailMessage.getMessageContent());
+        }
     }
 
     private void loadAttachments(EmailMessage emailMessage) {

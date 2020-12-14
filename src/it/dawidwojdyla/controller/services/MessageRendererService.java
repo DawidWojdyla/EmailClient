@@ -25,10 +25,10 @@ public class MessageRendererService extends Service {
     public MessageRendererService(WebEngine webEngine) {
         this.webEngine = webEngine;
         this.stringBuffer = new StringBuffer();
-        this.setOnSucceeded(event -> displayMessage());
-    }
-
-    public MessageRendererService(BodyPart bodyPart, StringBuffer stringBuffer) {
+        this.setOnSucceeded(event -> {
+            emailMessage.setMessageContent(stringBuffer.toString());
+            displayMessage();
+        });
     }
 
     public void setEmailMessage(EmailMessage emailMessage) {

@@ -14,15 +14,17 @@ import java.util.List;
  */
 public class EmailMessage {
 
-    private SimpleStringProperty subject;
-    private SimpleStringProperty sender;
-    private SimpleStringProperty recipient;
-    private SimpleObjectProperty<SizeInteger> size;
-    private SimpleObjectProperty<Date> date;
+    private final SimpleStringProperty subject;
+    private final SimpleStringProperty sender;
+    private final SimpleStringProperty recipient;
+    private final SimpleObjectProperty<SizeInteger> size;
+    private final SimpleObjectProperty<Date> date;
     private boolean isRead;
-    private Message message;
+    private final Message message;
 
-    private List<MimeBodyPart> attachmentList = new ArrayList<>();
+    private String messageContent;
+
+    private final List<MimeBodyPart> attachmentList = new ArrayList<>();
 
     private boolean hasAttachment = false;
 
@@ -30,8 +32,8 @@ public class EmailMessage {
         this.subject = new SimpleStringProperty(subject);
         this.sender = new SimpleStringProperty(sender);
         this.recipient = new SimpleStringProperty(recipient);
-        this.size = new SimpleObjectProperty<SizeInteger>(new SizeInteger(size));
-        this.date = new SimpleObjectProperty<Date>(date);
+        this.size = new SimpleObjectProperty<>(new SizeInteger(size));
+        this.date = new SimpleObjectProperty<>(date);
         this.isRead = isRead;
         this.message = message;
     }
@@ -74,6 +76,14 @@ public class EmailMessage {
 
     public List<MimeBodyPart> getAttachmentList() {
         return attachmentList;
+    }
+
+    public String getMessageContent() {
+        return messageContent;
+    }
+
+    public void setMessageContent(String messageContent) {
+        this.messageContent = messageContent;
     }
 
     public void addAttachment(MimeBodyPart mimeBodyPart) {

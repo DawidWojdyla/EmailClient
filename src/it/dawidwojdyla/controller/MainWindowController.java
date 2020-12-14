@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
 
@@ -110,7 +111,6 @@ public class MainWindowController extends AbstractController implements Initiali
 
         showForwardMessageWindowMenuItem.setOnAction(event -> {
             viewFactory.showComposeMessageWindow(ComposeMessageType.FORWARD);
-
         });
 
     }
@@ -118,17 +118,25 @@ public class MainWindowController extends AbstractController implements Initiali
     private void setUpMessageSelection() {
         emailsTableView.setOnMouseClicked(event -> {
             EmailMessage emailMessage = emailsTableView.getSelectionModel().getSelectedItem();
-            if (emailMessage != null && emailManager.getSelectedMessage() != emailMessage) {
+            if (emailMessage != null) {
                 emailManager.setSelectedMessage(emailMessage);
                 if(!emailMessage.isRead()) {
                     emailManager.setRead();
+                    emailsTableView.refresh();
                 }
-                emailsTableView.refresh();
-                messageRendererService.setEmailMessage(emailMessage);
-                messageRendererService.restart();
-
+                loadSelectedMessageContent(emailMessage);
             }
         });
+    }
+
+    private void loadSelectedMessageContent(EmailMessage emailMessage) {
+        if (emailMessage.getMessageContent() != null) {
+            WebEngine webEngine = emailWebView.getEngine();
+            webEngine.loadContent(emailMessage.getMessageContent());
+        } else if (!messageRendererService.isRunning()) {
+            messageRendererService.setEmailMessage(emailMessage);
+            messageRendererService.restart();
+        }
     }
 
     private void setUpMessageRendererService() {
