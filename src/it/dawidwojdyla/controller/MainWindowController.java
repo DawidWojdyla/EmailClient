@@ -118,7 +118,7 @@ public class MainWindowController extends AbstractController implements Initiali
     private void setUpMessageSelection() {
         emailsTableView.setOnMouseClicked(event -> {
             EmailMessage emailMessage = emailsTableView.getSelectionModel().getSelectedItem();
-            if (emailMessage != null) {
+            if (emailMessage != null && emailManager.getSelectedMessage() != emailMessage) {
                 emailManager.setSelectedMessage(emailMessage);
                 if(!emailMessage.isRead()) {
                     emailManager.setRead();
