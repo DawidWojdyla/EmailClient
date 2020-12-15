@@ -16,19 +16,25 @@ import java.io.IOException;
 /**
  * Created by Dawid on 2020-12-03.
  */
-public class MessageRendererService extends Service {
+public class MessageRendererService extends Service <Void> {
 
     private EmailMessage emailMessage;
     private WebEngine webEngine;
-    private StringBuffer stringBuffer;
+    private final StringBuffer stringBuffer;
 
     public MessageRendererService(WebEngine webEngine) {
         this.webEngine = webEngine;
         this.stringBuffer = new StringBuffer();
         this.setOnSucceeded(event -> {
-            emailMessage.setMessageContent(stringBuffer.toString());
             displayMessage();
+            emailMessage.setMessageContent(stringBuffer.toString());
         });
+    }
+
+    public MessageRendererService(EmailMessage emailMessage) {
+        this.emailMessage = emailMessage;
+        this.stringBuffer = new StringBuffer();
+        this.setOnSucceeded(e -> emailMessage.setMessageContent(stringBuffer.toString()));
     }
 
     public void setEmailMessage(EmailMessage emailMessage) {
@@ -37,9 +43,9 @@ public class MessageRendererService extends Service {
 
     @Override
     protected Task<Void> createTask() {
-        return new Task<Void>() {
+        return new Task<>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
                 try {
                     loadMessage();
                 } catch (Exception e) {
@@ -51,7 +57,9 @@ public class MessageRendererService extends Service {
     }
 
     private void displayMessage() {
-        webEngine.loadContent(stringBuffer.toString());
+        if (webEngine != null) {
+            webEngine.loadContent(stringBuffer.toString());
+        }
     }
 
     private void loadMessage() throws MessagingException, IOException {
@@ -87,19 +95,13 @@ public class MessageRendererService extends Service {
     }
 
     private boolean isSimpleType(String contentType) {
-        if(contentType.contains("TEXT/HTML") ||
-        contentType.contains("mixed") ||
-        contentType.contains("text")) {
-            return true;
-        }
-        return false;
+        return contentType.contains("TEXT/HTML") ||
+                contentType.contains("mixed") ||
+                contentType.contains("text");
     }
 
     private boolean isMultipartType(String contentType) {
-        if(contentType.contains("multipart")) {
-            return true;
-        }
-        return false;
+        return contentType.contains("multipart");
     }
 
 

@@ -2,6 +2,7 @@ package it.dawidwojdyla.controller;
 
 import it.dawidwojdyla.EmailManager;
 import it.dawidwojdyla.controller.services.EmailSenderService;
+import it.dawidwojdyla.controller.services.MessageRendererService;
 import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.view.ViewFactory;
@@ -118,24 +119,31 @@ public class ComposeMessageWindowController extends AbstractController implement
         emailAccountChoiceBox.setItems(emailManager.getEmailAccounts());
         emailAccountChoiceBox.setValue(emailManager.getEmailAccounts().get(0));
         if (messageType != ComposeMessageType.DEFAULT) {
-            setMessageData();
+            loadMessageData();
         }
     }
 
-    private void setMessageData() {
-        EmailMessage message = emailManager.getSelectedMessage();
-
-        if (messageType == ComposeMessageType.REPLY) {
-            subjectTextField.setText("Re: " + message.getSubject());
-            recipientTextField.setText(message.getSender());
-            htmlEditor.setHtmlText(prepareReplayHtmlText(message));
-
+    private void loadMessageData() {
+        EmailMessage emailMessage = emailManager.getSelectedMessage();
+        if (emailMessage.getMessageContent() == null) {
+            MessageRendererService messageRendererService = new MessageRendererService(emailMessage);
+            messageRendererService.restart();
+            messageRendererService.setOnSucceeded(e -> setMessageData(emailMessage));
         } else {
-            subjectTextField.setText("Fwd: " + message.getSubject());
-            htmlEditor.setHtmlText(prepareForwardHtmlText(message));
+            setMessageData(emailMessage);
+        }
+    }
 
-            if (message.hasAttachment()) {
-                for (MimeBodyPart bodyPart : message.getAttachmentList()) {
+    private void setMessageData(EmailMessage emailMessage) {
+        if (messageType == ComposeMessageType.REPLY) {
+            subjectTextField.setText("Re: " + emailMessage.getSubject());
+            recipientTextField.setText(emailMessage.getSender());
+            htmlEditor.setHtmlText(prepareReplayHtmlText(emailMessage));
+        } else {
+            subjectTextField.setText("Fwd: " + emailMessage.getSubject());
+            htmlEditor.setHtmlText(prepareForwardHtmlText(emailMessage));
+            if (emailMessage.hasAttachment()) {
+                for (MimeBodyPart bodyPart : emailMessage.getAttachmentList()) {
                     System.out.println("Adding attachments...");
                 }
             }
@@ -157,13 +165,12 @@ public class ComposeMessageWindowController extends AbstractController implement
                 "<td>Subject:</td><td>" + message.getSubject() + "</td></tr>" +
                 "<td>To:</td><td>" + message.getRecipient() + "</td></tr></table>";
         htmlText += prepareMessageContent(message);
-
         return htmlText;
     }
 
     private String prepareMessageContent(EmailMessage message) {
         String messageContent = "<blockquote style='border-left: 0.5px solid gray; padding: 5px; margin-left: 10px;'>";
-        messageContent += "HERE WILL BE MESSAGE CONTENT";
+        messageContent += message.getMessageContent();
         messageContent += "</blockquote>";
         return messageContent;
     }

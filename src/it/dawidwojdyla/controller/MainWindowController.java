@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
 
@@ -24,8 +23,8 @@ import java.util.ResourceBundle;
 public class MainWindowController extends AbstractController implements Initializable {
 
     private MenuItem markUnreadMenuItem = new MenuItem("mark as unread");
-    private MenuItem deleteMessageMenuItem  = new MenuItem("delete message");
-    private MenuItem showMessageDetailsMenuItem = new MenuItem("view details");
+    private final MenuItem deleteMessageMenuItem  = new MenuItem("delete message");
+    private final MenuItem showMessageDetailsMenuItem = new MenuItem("view details");
     private MenuItem showReplyMessageWindowMenuItem = new MenuItem("reply");
     private MenuItem showForwardMessageWindowMenuItem = new MenuItem("forward");
 
@@ -104,39 +103,30 @@ public class MainWindowController extends AbstractController implements Initiali
 
         showMessageDetailsMenuItem.setOnAction(actionEvent -> viewFactory.showEmailDetailsWindow());
 
-        showReplyMessageWindowMenuItem.setOnAction(event -> {
-            viewFactory.showComposeMessageWindow(ComposeMessageType.REPLY);
+        showReplyMessageWindowMenuItem.setOnAction(event -> viewFactory.showComposeMessageWindow(ComposeMessageType.REPLY));
 
-        });
-
-        showForwardMessageWindowMenuItem.setOnAction(event -> {
-            viewFactory.showComposeMessageWindow(ComposeMessageType.FORWARD);
-        });
+        showForwardMessageWindowMenuItem.setOnAction(event -> viewFactory.showComposeMessageWindow(ComposeMessageType.FORWARD));
 
     }
 
     private void setUpMessageSelection() {
         emailsTableView.setOnMouseClicked(event -> {
             EmailMessage emailMessage = emailsTableView.getSelectionModel().getSelectedItem();
-            if (emailMessage != null) {
+            if (emailMessage != null && emailMessage != emailManager.getSelectedMessage()) {
                 emailManager.setSelectedMessage(emailMessage);
                 if(!emailMessage.isRead()) {
                     emailManager.setRead();
                     emailsTableView.refresh();
                 }
-                loadSelectedMessageContent(emailMessage);
+                if (emailMessage.getMessageContent() != null) {
+                    emailWebView.getEngine().loadContent(emailMessage.getMessageContent());
+                } else {
+                    messageRendererService = new MessageRendererService(emailWebView.getEngine());
+                    messageRendererService.setEmailMessage(emailMessage);
+                    messageRendererService.restart();
+                }
             }
         });
-    }
-
-    private void loadSelectedMessageContent(EmailMessage emailMessage) {
-        if (emailMessage.getMessageContent() != null) {
-            WebEngine webEngine = emailWebView.getEngine();
-            webEngine.loadContent(emailMessage.getMessageContent());
-        } else if (!messageRendererService.isRunning()) {
-            messageRendererService.setEmailMessage(emailMessage);
-            messageRendererService.restart();
-        }
     }
 
     private void setUpMessageRendererService() {
@@ -144,20 +134,20 @@ public class MainWindowController extends AbstractController implements Initiali
     }
 
     private void setUpBoldRows() {
-        emailsTableView.setRowFactory(new Callback<TableView<EmailMessage>, TableRow<EmailMessage>>() {
+        emailsTableView.setRowFactory(new Callback<>() {
             @Override
             public TableRow<EmailMessage> call(TableView<EmailMessage> param) {
-                return new TableRow<EmailMessage>() {
+                return new TableRow<>() {
                     @Override
                     protected void updateItem(EmailMessage item, boolean empty) {
-                         super.updateItem(item, empty);
-                         if(item != null) {
-                             if(item.isRead()) {
-                                 setStyle("");
-                             } else {
-                                 setStyle("-fx-font-weight: bold");
-                             }
-                         }
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            if (item.isRead()) {
+                                setStyle("");
+                            } else {
+                                setStyle("-fx-font-weight: bold");
+                            }
+                        }
                     }
                 };
             }
@@ -170,18 +160,28 @@ public class MainWindowController extends AbstractController implements Initiali
             if (item != null) {
                 emailManager.setSelectedFolder(item);
                 emailsTableView.setItems(item.getEmailMessages());
+                if (item.getValue().toLowerCase().contains("wysłane") || item.getValue().toLowerCase().contains("sent")) {
+                    showReplyMessageWindowMenuItem.setVisible(false);
+                } else {
+                    showReplyMessageWindowMenuItem.setVisible(true);
+                }
             }
         });
     }
 
     private void setUpEmailsTableView() {
-        senderColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("sender"));
-        subjectColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("subject"));
-        recipientColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("recipient"));
-        sizeColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, SizeInteger>("size"));
-        dateColumn.setCellValueFactory(new PropertyValueFactory<EmailMessage, Date>("date"));
+        senderColumn.setCellValueFactory(new PropertyValueFactory<>("sender"));
+        subjectColumn.setCellValueFactory(new PropertyValueFactory<>("subject"));
+        recipientColumn.setCellValueFactory(new PropertyValueFactory<>("recipient"));
+        sizeColumn.setCellValueFactory(new PropertyValueFactory<>("size"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 
-        emailsTableView.setContextMenu(new ContextMenu(markUnreadMenuItem, deleteMessageMenuItem, showMessageDetailsMenuItem, showReplyMessageWindowMenuItem, showForwardMessageWindowMenuItem));
+        emailsTableView.setContextMenu(new ContextMenu(
+                markUnreadMenuItem,
+                deleteMessageMenuItem,
+                showMessageDetailsMenuItem,
+                showReplyMessageWindowMenuItem,
+                showForwardMessageWindowMenuItem));
     }
 
     private void setUpEmailsTreeView() {
