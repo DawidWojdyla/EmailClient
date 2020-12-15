@@ -2,6 +2,7 @@ package it.dawidwojdyla.view;
 
 import it.dawidwojdyla.EmailManager;
 import it.dawidwojdyla.controller.*;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -59,6 +60,8 @@ public class ViewFactory {
         AbstractController controller = new MainWindowController(emailManager, this, "MainWindow.fxml");
         initializeStage(controller, true);
         mainViewInitialized = true;
+        activeStages.get(activeStages.size() - 1).setOnCloseRequest(e -> Platform.exit());
+
     }
 
     public void showOptionsWindow() {
