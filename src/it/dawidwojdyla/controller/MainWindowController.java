@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
 
@@ -112,8 +113,14 @@ public class MainWindowController extends AbstractController implements Initiali
     private void setUpMessageSelection() {
         emailsTableView.setOnMouseClicked(event -> {
             EmailMessage emailMessage = emailsTableView.getSelectionModel().getSelectedItem();
-            if (emailMessage != null && emailMessage != emailManager.getSelectedMessage()) {
+            if (emailMessage != null) {
                 emailManager.setSelectedMessage(emailMessage);
+
+                if (event.getButton().equals(MouseButton.PRIMARY)) {
+                    if (event.getClickCount() == 2) {
+                        viewFactory.showEmailDetailsWindow();
+                    }
+                }
                 if(!emailMessage.isRead()) {
                     emailManager.setRead();
                     emailsTableView.refresh();

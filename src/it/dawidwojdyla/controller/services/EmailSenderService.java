@@ -46,20 +46,18 @@ public class EmailSenderService extends Service<EmailSendingResult> {
             @Override
             protected EmailSendingResult call() {
                 try {
-                    //Create the message:
                     MimeMessage mimeMessage = new MimeMessage(emailAccount.getSession());
                     mimeMessage.setFrom(emailAccount.getAddress());
                     mimeMessage.addRecipients(Message.RecipientType.TO, recipient);
                     mimeMessage.setSubject(subject);
-                    //Set content:
+
                     Multipart multipart = new MimeMultipart();
                     BodyPart messageBodyPart = new MimeBodyPart();
                     messageBodyPart.setContent(messageContent, "text/html; charset=UTF-8");
                     multipart.addBodyPart(messageBodyPart);
                     addAttachments(multipart);
-
                     mimeMessage.setContent(multipart);
-                    //sending the message:
+
                     Transport transport = emailAccount.getSession().getTransport();
                     transport.connect(
                             emailAccount.getProperties().getProperty("outgoingHost"),
