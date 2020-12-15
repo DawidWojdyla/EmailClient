@@ -27,19 +27,22 @@ public class EmailSenderService extends Service<EmailSendingResult> {
     private String recipient;
     private String messageContent;
     private List<File> attachments;
+    private List<MimeBodyPart> attachmentsForForwarding;
 
 
-    public EmailSenderService(EmailAccount emailAccount, String subject, String recipient, String messageContent, List<File> attachments) {
+    public EmailSenderService(EmailAccount emailAccount, String subject, String recipient, String messageContent,
+                              List<File> attachments, List<MimeBodyPart> attachmentsForForwarding) {
         this.emailAccount = emailAccount;
         this.subject = subject;
         this.recipient = recipient;
         this.messageContent = messageContent;
         this.attachments = attachments;
+        this.attachmentsForForwarding = attachmentsForForwarding;
     }
 
     @Override
-    protected Task createTask() {
-        return new Task() {
+    protected Task<EmailSendingResult> createTask() {
+        return new Task<>() {
             @Override
             protected EmailSendingResult call() {
                 try {
@@ -51,9 +54,10 @@ public class EmailSenderService extends Service<EmailSendingResult> {
                     //Set content:
                     Multipart multipart = new MimeMultipart();
                     BodyPart messageBodyPart = new MimeBodyPart();
-                    messageBodyPart.setContent(messageContent, "text/html");
+                    messageBodyPart.setContent(messageContent, "text/html; charset=UTF-8");
                     multipart.addBodyPart(messageBodyPart);
                     addAttachments(multipart);
+
                     mimeMessage.setContent(multipart);
                     //sending the message:
                     Transport transport = emailAccount.getSession().getTransport();
@@ -71,8 +75,11 @@ public class EmailSenderService extends Service<EmailSendingResult> {
             }
 
             private void addAttachments(Multipart multipart) throws MessagingException {
-                for (File attachment: attachments) {
-                    if(attachment.exists()) {
+                for (MimeBodyPart attachment : attachmentsForForwarding) {
+                    multipart.addBodyPart(attachment);
+                }
+                for (File attachment : attachments) {
+                    if (attachment.exists()) {
                         BodyPart attachmentBodyPart = new MimeBodyPart();
                         DataSource dataSource = new FileDataSource(attachment.getAbsolutePath());
                         attachmentBodyPart.setDataHandler(new DataHandler(dataSource));

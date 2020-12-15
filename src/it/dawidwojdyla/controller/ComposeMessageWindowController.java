@@ -18,6 +18,7 @@ import javafx.scene.web.HTMLEditor;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import java.io.File;
 import java.net.URL;
@@ -31,6 +32,8 @@ import java.util.ResourceBundle;
 public class ComposeMessageWindowController extends AbstractController implements Initializable {
 
     private List<File> attachments = new ArrayList<>();
+
+    private List<MimeBodyPart> attachmentsForForwarding = new ArrayList<>();
 
     @FXML
     private TextField recipientTextField;
@@ -64,7 +67,8 @@ public class ComposeMessageWindowController extends AbstractController implement
                 subjectTextField.getText(),
                 recipientTextField.getText(),
                 htmlEditor.getHtmlText(),
-                attachments);
+                attachments,
+                attachmentsForForwarding);
         emailSenderService.start();
         emailSenderService.setOnSucceeded(e -> {
             EmailSendingResult emailSendingResult = emailSenderService.getValue();
@@ -80,7 +84,6 @@ public class ComposeMessageWindowController extends AbstractController implement
                     errorLabel.setText("Unexpected error!");
                     break;
             }
-
         });
     }
 
@@ -89,29 +92,37 @@ public class ComposeMessageWindowController extends AbstractController implement
         FileChooser fileChooser = new FileChooser();
         File selectedFile = fileChooser.showOpenDialog(null);
         if (selectedFile != null && !attachments.contains(selectedFile)) {
-            addAttachment(selectedFile);
+            attachments.add(selectedFile);
+            addAttachmentToAttachBox(selectedFile, selectedFile.getName(), attachments);
         }
     }
 
-    private void addAttachment(File selectedFile) {
-        attachments.add(selectedFile);
-
-        TextFlow textFlow = new TextFlow();
+    private void addAttachmentToAttachBox(Object attachment, String fileName, List attachmentList) {
+        TextFlow attachmentTextFlow = new TextFlow();
 
         Text closingSign = new Text(" x ");
         closingSign.setStyle("-fx-font-weight: bold; -fx-cursor: hand");
         closingSign.setOnMouseClicked(e -> {
-            attachments.remove(selectedFile);
-            attachHBox.getChildren().remove(textFlow);
+            attachmentList.remove(attachment);
+            attachHBox.getChildren().remove(attachmentTextFlow);
         });
 
-        String fileName = selectedFile.getName();
         if(fileName.length() > 20) {
             fileName = fileName.substring(0, 17) + "...";
         }
 
-        textFlow.getChildren().addAll(new Text(fileName), closingSign);
-        attachHBox.getChildren().add(textFlow);
+        attachmentTextFlow.getChildren().addAll(new Text(fileName), closingSign);
+        attachHBox.getChildren().add(attachmentTextFlow);
+    }
+
+    private void addAttachmentsForForwardingToAttachBox() {
+        for (MimeBodyPart attachmentBodyPart : attachmentsForForwarding) {
+            try {
+                addAttachmentToAttachBox(attachmentBodyPart, attachmentBodyPart.getFileName(), attachmentsForForwarding);
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -143,9 +154,8 @@ public class ComposeMessageWindowController extends AbstractController implement
             subjectTextField.setText("Fwd: " + emailMessage.getSubject());
             htmlEditor.setHtmlText(prepareForwardHtmlText(emailMessage));
             if (emailMessage.hasAttachment()) {
-                for (MimeBodyPart bodyPart : emailMessage.getAttachmentList()) {
-                    System.out.println("Adding attachments...");
-                }
+                attachmentsForForwarding.addAll(emailMessage.getAttachmentList());
+                addAttachmentsForForwardingToAttachBox();
             }
         }
     }

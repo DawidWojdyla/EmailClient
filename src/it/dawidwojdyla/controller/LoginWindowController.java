@@ -43,7 +43,6 @@ public class LoginWindowController extends AbstractController implements Initial
                 EmailLoginResult emailLoginResult = loginService.getValue();
                 switch(emailLoginResult) {
                     case SUCCESS:
-                        System.out.println("Login succesfull! " + emailAccount);
                         if(!viewFactory.isMainViewInitialized()) {
                             viewFactory.showMainWindow();
                         }
@@ -58,7 +57,6 @@ public class LoginWindowController extends AbstractController implements Initial
                         return;
                     default:
                 }
-
             });
         }
     }
