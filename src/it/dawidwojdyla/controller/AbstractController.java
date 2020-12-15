@@ -10,7 +10,7 @@ public abstract class AbstractController {
 
     protected EmailManager emailManager;
     protected ViewFactory viewFactory;
-    private String fxmlName;
+    private final String fxmlName;
 
     public AbstractController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
         this.emailManager = emailManager;

@@ -5,7 +5,6 @@ import it.dawidwojdyla.view.ColorTheme;
 import it.dawidwojdyla.view.FontSize;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
@@ -61,7 +60,7 @@ public class OptionsWindowController extends AbstractController implements Initi
         fontSizePicker.setSnapToTicks(true);
         fontSizePicker.setShowTickMarks(true);
         fontSizePicker.setShowTickLabels(true);
-        fontSizePicker.setLabelFormatter(new StringConverter<Double>() {
+        fontSizePicker.setLabelFormatter(new StringConverter<>() {
 
             @Override
             public String toString(Double aDouble) {
@@ -74,9 +73,7 @@ public class OptionsWindowController extends AbstractController implements Initi
                 return null;
             }
         });
-        fontSizePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
-            fontSizePicker.setValue(newVal.intValue());
-        });
+        fontSizePicker.valueProperty().addListener((obs, oldVal, newVal) -> fontSizePicker.setValue(newVal.intValue()));
     }
 
     private void setUpThemePicker() {

@@ -57,7 +57,6 @@ public class LoginWindowController extends AbstractController implements Initial
                         errorLabel.setText("Unexpected error!");
                         return;
                     default:
-                        return;
                 }
 
             });
