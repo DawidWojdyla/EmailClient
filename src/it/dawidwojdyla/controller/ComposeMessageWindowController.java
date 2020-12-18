@@ -8,6 +8,7 @@ import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -100,18 +101,16 @@ public class ComposeMessageWindowController extends AbstractController implement
     private void addAttachmentToAttachBox(Object attachment, String fileName, List attachmentList) {
         TextFlow attachmentTextFlow = new TextFlow();
 
-        Text closingSign = new Text(" x ");
-        closingSign.setStyle("-fx-font-weight: bold; -fx-cursor: hand");
-        closingSign.setOnMouseClicked(e -> {
+        Button closingButton = new Button("x");
+        closingButton.setStyle("-fx-base: #f3622d; -fx-margin:1px; -fx-padding: -1px 4px 1px 4px; -fx-font-weight: bold; -fx-cursor: hand;");
+        closingButton.setOnAction(e -> {
             attachmentList.remove(attachment);
             attachHBox.getChildren().remove(attachmentTextFlow);
         });
 
-        if(fileName.length() > 20) {
-            fileName = fileName.substring(0, 17) + "...";
-        }
+        attachmentTextFlow.getChildren().addAll(new Text(fileName), closingButton);
+        attachmentTextFlow.setMinWidth(TextFlow.USE_PREF_SIZE);
 
-        attachmentTextFlow.getChildren().addAll(new Text(fileName), closingSign);
         attachHBox.getChildren().add(attachmentTextFlow);
     }
 
@@ -132,6 +131,7 @@ public class ComposeMessageWindowController extends AbstractController implement
         if (messageType != ComposeMessageType.DEFAULT) {
             loadMessageData();
         }
+        attachHBox.setSpacing(3);
     }
 
     private void loadMessageData() {

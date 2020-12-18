@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -14,12 +16,20 @@
       <Label layoutX="20.0" layoutY="102.0" prefHeight="18.0" prefWidth="57.0" text="Subject" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="105.0" />
       <TextField fx:id="recipientTextField" layoutX="87.0" layoutY="62.0" prefHeight="25.0" prefWidth="485.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="65.0" />
       <TextField fx:id="subjectTextField" layoutX="87.0" layoutY="98.0" prefHeight="25.0" prefWidth="485.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="105.0" />
-      <HTMLEditor fx:id="htmlEditor" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" layoutX="-7.0" layoutY="180.0" prefHeight="463.0" prefWidth="654.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="180.0" />
+      <HTMLEditor fx:id="htmlEditor" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" layoutY="186.0" prefHeight="451.0" prefWidth="674.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="186.0" />
       <Button layoutX="514.0" layoutY="646.0" mnemonicParsing="false" onAction="#sendButtonAction" prefHeight="40.0" prefWidth="150.0" text="Send" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0" />
       <Label fx:id="errorLabel" layoutX="20.0" layoutY="504.0" prefHeight="25.0" prefWidth="309.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" />
       <Label layoutX="20.0" layoutY="14.0" prefHeight="18.0" prefWidth="57.0" text="Account" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="25.0" />
       <ChoiceBox fx:id="emailAccountChoiceBox" layoutX="80.0" layoutY="36.0" prefHeight="25.0" prefWidth="309.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="25.0" />
-      <Button layoutX="10.0" layoutY="145.0" mnemonicParsing="false" onAction="#attachButtonAction" prefHeight="25.0" prefWidth="57.0" text="Attach:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="145.0" />
-      <HBox fx:id="attachHBox" layoutX="80.0" layoutY="145.0" prefHeight="25.0" prefWidth="584.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="145.0" />
+      <Button layoutX="10.0" layoutY="151.0" mnemonicParsing="false" onAction="#attachButtonAction" prefHeight="25.0" prefWidth="57.0" text="Attach:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="151.0" />
+      <ScrollPane fitToHeight="true" layoutX="80.0" layoutY="144.0" prefHeight="40.0" prefWidth="584.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="140.0">
+         <content>
+            <HBox fx:id="attachHBox" prefHeight="30.0" prefWidth="582.0" snapToPixel="false">
+               <padding>
+                  <Insets left="2.0" top="5.0" />
+               </padding>
+            </HBox>
+         </content>
+      </ScrollPane>
    </children>
 </AnchorPane>
