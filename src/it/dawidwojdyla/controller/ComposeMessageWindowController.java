@@ -102,7 +102,9 @@ public class ComposeMessageWindowController extends AbstractController implement
         TextFlow attachmentTextFlow = new TextFlow();
 
         Button closingButton = new Button("x");
-        closingButton.setStyle("-fx-base: #f3622d; -fx-margin:1px; -fx-padding: -1px 4px 1px 4px; -fx-font-weight: bold; -fx-cursor: hand;");
+        closingButton.getStyleClass().add("attachRemoveButton");
+        //closingButton.setStyle("-fx-base: #f3622d; -fx-margin:1px; -fx-padding: -1px 4px 1px 4px; -fx-font-weight: bold; -fx-cursor: hand;");
+
         closingButton.setOnAction(e -> {
             attachmentList.remove(attachment);
             attachHBox.getChildren().remove(attachmentTextFlow);
@@ -131,7 +133,6 @@ public class ComposeMessageWindowController extends AbstractController implement
         if (messageType != ComposeMessageType.DEFAULT) {
             loadMessageData();
         }
-        attachHBox.setSpacing(3);
     }
 
     private void loadMessageData() {

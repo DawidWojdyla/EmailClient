@@ -8,8 +8,10 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 
@@ -43,6 +45,9 @@ public class EmailDetailsWindowController extends AbstractController implements 
     @FXML
     private HBox hBoxDownloads;
 
+    @FXML
+    private ScrollPane attachScrollPane;
+
     public EmailDetailsWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
         super(emailManager, viewFactory, fxmlName);
     }
@@ -74,6 +79,7 @@ public class EmailDetailsWindowController extends AbstractController implements 
         for (MimeBodyPart mimeBodyPart: emailMessage.getAttachmentList()) {
             try {
                 Button button = new AttachmentButton(mimeBodyPart);
+                button.setMinWidth(120);
                 hBoxDownloads.getChildren().add(button);
             } catch (MessagingException e) {
                 e.printStackTrace();

@@ -1,0 +1,24 @@
+/*TreeView {
+    -fx-focus-color: transparent;
+}*/
+
+HBox {
+    -fx-spacing: 2;
+}
+
+ScrollPane {
+    -fx-background-color:transparent;
+}
+
+HTMLEditor, TreeView, TableView {
+    -fx-focus-color: transparent;
+    /* -fx-faint-focus-color: transparent; */
+}
+
+.attachRemoveButton {
+    -fx-base: #f3622d;
+    -fx-margin:1px;
+    -fx-padding: -1px 4px 1px 4px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
