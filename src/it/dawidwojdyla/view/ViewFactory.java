@@ -2,6 +2,7 @@ package it.dawidwojdyla.view;
 
 import it.dawidwojdyla.EmailManager;
 import it.dawidwojdyla.controller.*;
+import it.dawidwojdyla.controller.services.MessageRendererService;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -81,8 +82,8 @@ public class ViewFactory {
     }
 
 
-    public void showEmailDetailsWindow() {
-        AbstractController controller = new EmailDetailsWindowController(emailManager, this, "EmailDetailsWindow.fxml");
+    public void showEmailDetailsWindow(MessageRendererService messageRendererService) {
+        AbstractController controller = new EmailDetailsWindowController(emailManager, this, "EmailDetailsWindow.fxml", messageRendererService);
         initializeStage(controller,true);
     }
 

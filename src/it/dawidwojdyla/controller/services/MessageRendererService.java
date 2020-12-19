@@ -26,8 +26,8 @@ public class MessageRendererService extends Service <Void> {
         this.webEngine = webEngine;
         this.stringBuffer = new StringBuffer();
         this.setOnSucceeded(event -> {
-            displayMessage();
             emailMessage.setMessageContent(stringBuffer.toString());
+            displayMessage();
         });
     }
 

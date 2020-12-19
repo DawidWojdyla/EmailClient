@@ -102,7 +102,7 @@ public class MainWindowController extends AbstractController implements Initiali
             emailWebView.getEngine().loadContent("");
         });
 
-        showMessageDetailsMenuItem.setOnAction(actionEvent -> viewFactory.showEmailDetailsWindow());
+        showMessageDetailsMenuItem.setOnAction(actionEvent -> viewFactory.showEmailDetailsWindow(messageRendererService));
 
         showReplyMessageWindowMenuItem.setOnAction(event -> viewFactory.showComposeMessageWindow(ComposeMessageType.REPLY));
 
@@ -116,21 +116,22 @@ public class MainWindowController extends AbstractController implements Initiali
             if (emailMessage != null) {
                 emailManager.setSelectedMessage(emailMessage);
 
-                if (event.getButton().equals(MouseButton.PRIMARY)) {
-                    if (event.getClickCount() == 2) {
-                        viewFactory.showEmailDetailsWindow();
-                    }
-                }
                 if(!emailMessage.isRead()) {
                     emailManager.setRead();
                     emailsTableView.refresh();
                 }
+
                 if (emailMessage.getMessageContent() != null) {
                     emailWebView.getEngine().loadContent(emailMessage.getMessageContent());
                 } else {
                     messageRendererService = new MessageRendererService(emailWebView.getEngine());
                     messageRendererService.setEmailMessage(emailMessage);
                     messageRendererService.restart();
+                }
+                if (event.getButton().equals(MouseButton.PRIMARY)) {
+                    if (event.getClickCount() == 2) {
+                        viewFactory.showEmailDetailsWindow(messageRendererService);
+                    }
                 }
             }
         });

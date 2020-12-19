@@ -6,9 +6,10 @@ import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -48,8 +49,11 @@ public class EmailDetailsWindowController extends AbstractController implements 
     @FXML
     private ScrollPane attachScrollPane;
 
-    public EmailDetailsWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
+    private MessageRendererService messageRendererService;
+
+    public EmailDetailsWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName, MessageRendererService messageRendererService) {
         super(emailManager, viewFactory, fxmlName);
+        this.messageRendererService = messageRendererService;
     }
 
 
@@ -59,23 +63,32 @@ public class EmailDetailsWindowController extends AbstractController implements 
         EmailMessage emailMessage = emailManager.getSelectedMessage();
         subjectLabel.setText(emailMessage.getSubject());
         senderLabel.setText(emailMessage.getSender());
-
-        if(emailMessage.hasAttachment()) {
-            loadAttachments(emailMessage);
-        } else {
-            attachmentLabel.setVisible(false);
-        }
+        attachmentLabel.setVisible(false);
 
         if (emailMessage.getMessageContent() == null) {
-            MessageRendererService messageRendererService = new MessageRendererService(webView.getEngine());
-            messageRendererService.setEmailMessage(emailMessage);
-            messageRendererService.restart();
+            messageRendererService.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
+                @Override
+                public void handle(WorkerStateEvent workerStateEvent) {
+                    if (emailMessage.getMessageContent() == null) {
+                        messageRendererService.restart();
+                    }
+                    showMessage(emailMessage);
+                }
+            });
         } else {
-            webView.getEngine().loadContent(emailMessage.getMessageContent());
+            showMessage(emailMessage);
         }
     }
 
+    private void showMessage(EmailMessage emailMessage) {
+        if(emailMessage.hasAttachment()) {
+            loadAttachments(emailMessage);
+        }
+        webView.getEngine().loadContent(emailMessage.getMessageContent());
+    }
+
     private void loadAttachments(EmailMessage emailMessage) {
+        attachmentLabel.setVisible(true);
         for (MimeBodyPart mimeBodyPart: emailMessage.getAttachmentList()) {
             try {
                 Button button = new AttachmentButton(mimeBodyPart);
