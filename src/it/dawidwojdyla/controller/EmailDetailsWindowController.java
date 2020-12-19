@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
  */
 public class EmailDetailsWindowController extends AbstractController implements Initializable {
 
-    private String LOCATION_OF_DOWNLOADS = System.getProperty("user.home") + "/Downloads/";
+    private final String LOCATION_OF_DOWNLOADS = System.getProperty("user.home") + "/Downloads/";
 
     @FXML
     private WebView webView;
@@ -66,14 +66,11 @@ public class EmailDetailsWindowController extends AbstractController implements 
         attachmentLabel.setVisible(false);
 
         if (emailMessage.getMessageContent() == null) {
-            messageRendererService.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
-                @Override
-                public void handle(WorkerStateEvent workerStateEvent) {
-                    if (emailMessage.getMessageContent() == null) {
-                        messageRendererService.restart();
-                    }
-                    showMessage(emailMessage);
+            messageRendererService.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
+                if (emailMessage.getMessageContent() == null) {
+                    messageRendererService.restart();
                 }
+                showMessage(emailMessage);
             });
         } else {
             showMessage(emailMessage);
@@ -116,10 +113,10 @@ public class EmailDetailsWindowController extends AbstractController implements 
 
         private void downloadAttachment() {
             colorBlue();
-            Service downloadingService = new Service() {
+            Service<Void> downloadingService = new Service<>() {
                 @Override
-                protected Task createTask() {
-                    return new Task() {
+                protected Task<Void> createTask() {
+                    return new Task<>() {
                         @Override
                         protected Void call() throws Exception {
                             mimeBodyPart.saveFile(downloadedFilePath);

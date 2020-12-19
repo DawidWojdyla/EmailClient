@@ -8,6 +8,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.web.HTMLEditor?>
 
 <AnchorPane prefHeight="687.0" prefWidth="674.0" styleClass="container" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
@@ -31,5 +32,6 @@
             </HBox>
          </content>
       </ScrollPane>
+      <Pane fx:id="progresIndicatorPane" layoutX="568.0" layoutY="642.0" opacity="0.9" prefHeight="40.0" prefWidth="43.0" visible="false" AnchorPane.bottomAnchor="4.0" AnchorPane.rightAnchor="60.0" />
    </children>
 </AnchorPane>

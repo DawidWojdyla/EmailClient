@@ -8,11 +8,9 @@ import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.scene.web.HTMLEditor;
@@ -52,6 +50,11 @@ public class ComposeMessageWindowController extends AbstractController implement
     private HBox attachHBox;
 
     @FXML
+    private Pane progresIndicatorPane;
+
+    private ProgressIndicator progresIndicator = new ProgressIndicator();
+
+    @FXML
     private ChoiceBox<EmailAccount> emailAccountChoiceBox;
 
     private ComposeMessageType messageType;
@@ -63,6 +66,7 @@ public class ComposeMessageWindowController extends AbstractController implement
 
     @FXML
     void sendButtonAction() {
+        progresIndicatorPane.setVisible(true);
         EmailSenderService emailSenderService = new EmailSenderService(
                 emailAccountChoiceBox.getValue(),
                 subjectTextField.getText(),
@@ -85,6 +89,7 @@ public class ComposeMessageWindowController extends AbstractController implement
                     errorLabel.setText("Unexpected error!");
                     break;
             }
+            progresIndicatorPane.setVisible(false);
         });
     }
 
@@ -133,6 +138,11 @@ public class ComposeMessageWindowController extends AbstractController implement
         if (messageType != ComposeMessageType.DEFAULT) {
             loadMessageData();
         }
+        progresIndicator.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        progresIndicator.setMaxWidth(38);
+        progresIndicator.setMaxHeight(38);
+        progresIndicatorPane.getChildren().add(progresIndicator);
+
     }
 
     private void loadMessageData() {
