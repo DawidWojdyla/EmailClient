@@ -1,6 +1,7 @@
 package it.dawidwojdyla.view;
 
 import it.dawidwojdyla.EmailManager;
+import it.dawidwojdyla.Main;
 import it.dawidwojdyla.controller.*;
 import it.dawidwojdyla.controller.services.MessageRendererService;
 import javafx.application.Platform;
@@ -88,7 +89,7 @@ public class ViewFactory {
     }
 
     private void initializeStage(AbstractController controller, boolean resizable) {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(controller.getFxmlName()));
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getClassLoader().getResource("fxml/" + controller.getFxmlName()));
         fxmlLoader.setController(controller);
         Parent parent;
         try {
@@ -123,9 +124,9 @@ public class ViewFactory {
 
     private void updateStyle(Scene scene){
         scene.getStylesheets().clear();
-        scene.getStylesheets().add(getClass().getResource("css/default.css").toExternalForm());
-        scene.getStylesheets().add(getClass().getResource(ColorTheme.getCssPath(colorTheme)).toExternalForm());
-        scene.getStylesheets().add(getClass().getResource(FontSize.getCssPath(fontSize)).toExternalForm());
+        scene.getStylesheets().add(Main.class.getClassLoader().getResource("css/default.css").toExternalForm());
+        scene.getStylesheets().add(Main.class.getClassLoader().getResource(ColorTheme.getCssPath(colorTheme)).toExternalForm());
+        scene.getStylesheets().add(Main.class.getClassLoader().getResource(FontSize.getCssPath(fontSize)).toExternalForm());
     }
 
 }

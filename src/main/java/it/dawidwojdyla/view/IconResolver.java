@@ -1,5 +1,6 @@
 package it.dawidwojdyla.view;
 
+import it.dawidwojdyla.Main;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -15,17 +16,17 @@ public class IconResolver {
 
         try {
             if (lowerCaseFolderName.contains("@")) {
-                imageView = new ImageView(new Image(getClass().getResourceAsStream("icons/email.png")));
+                imageView = new ImageView(new Image(Main.class.getClassLoader().getResourceAsStream("icons/email.png")));
             } else if (lowerCaseFolderName.contains("inbox") || lowerCaseFolderName.contains("przychodzące")) {
-                imageView = new ImageView(new Image(getClass().getResourceAsStream("icons/inbox.png")));
+                imageView = new ImageView(new Image(Main.class.getClassLoader().getResourceAsStream("icons/inbox.png")));
             } else if (lowerCaseFolderName.contains("sent") || lowerCaseFolderName.contains("wysłane")) {
-                imageView = new ImageView(new Image(getClass().getResourceAsStream("icons/sent2.png")));
+                imageView = new ImageView(new Image(Main.class.getClassLoader().getResourceAsStream("icons/sent2.png")));
             } else if (lowerCaseFolderName.contains("spam")) {
-                imageView = new ImageView(new Image(getClass().getResourceAsStream("icons/spam.png")));
+                imageView = new ImageView(new Image(Main.class.getClassLoader().getResourceAsStream("icons/spam.png")));
             } else if (lowerCaseFolderName.contains("trash") || lowerCaseFolderName.contains("kosz")) {
-            imageView = new ImageView(new Image(getClass().getResourceAsStream("icons/bin.png")));
+            imageView = new ImageView(new Image(Main.class.getClassLoader().getResourceAsStream("icons/bin.png")));
         }else {
-                imageView = new ImageView(new Image(getClass().getResourceAsStream("icons/folder.png")));
+                imageView = new ImageView(new Image(Main.class.getClassLoader().getResourceAsStream("icons/folder.png")));
             }
         } catch (Exception e) {
             e.printStackTrace();
