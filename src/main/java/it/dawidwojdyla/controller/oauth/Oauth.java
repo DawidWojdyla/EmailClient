@@ -100,8 +100,12 @@ public class Oauth {
     }
 
     private String extractAuthorizationCodeFromURL(String url) {
-        //return authorization code method
-        return "";
+        String authorizationCode = "";
+        authorizationCode = url.substring(url.indexOf("code=") + 5);
+        if (authorizationCode.contains("&")) {
+            authorizationCode = authorizationCode.substring(0, authorizationCode.indexOf("&"));
+        }
+        return authorizationCode;
     }
 
     private void manageWithAuthorizationCode() {
