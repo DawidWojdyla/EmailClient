@@ -6,11 +6,13 @@ import it.dawidwojdyla.controller.ObtainAuthorizationCodeWindowController;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+
+
 
 /**
  * Created by Dawid on 2020-12-27.
@@ -19,21 +21,18 @@ public class Oauth {
 
     private String oauthClientId;
     private String oauthClientSecret;
-
     private String refreshToken;
     private String accessToken;
     private String authorizationCode;
     private long tokenExpires;
     private String tokenUrl;
-
-
     private String authorizationCodeUrl;
     private String scope;
     private String securityToken;
     private String redirectUri;
 
-    private ViewFactory viewFactory;
-    private EmailManager emailManager;
+    private final ViewFactory viewFactory;
+    private final EmailManager emailManager;
 
     public Oauth(EmailManager emailManager, ViewFactory viewFactory) {
         this.emailManager = emailManager;
@@ -42,7 +41,7 @@ public class Oauth {
         loadCredentials();
     }
 
-    public String getAccessToken() {
+    public String getAccessToken() throws IOException {
         if (accessToken == null || refreshToken == null) {
             obtainAuthorizationCode();
         } else if (System.currentTimeMillis() > tokenExpires) {
@@ -52,7 +51,7 @@ public class Oauth {
     }
 
     private void loadCredentials() {
-        //just for now (have to be in a file)
+        //just for now
         oauthClientId = "1097648184338-d4h0ojjclgf4ng6ap7vgc4bbu2d3sfu1.apps.googleusercontent.com";
         oauthClientSecret = "AmB8QDH9NilclJNiwR_OJriI";
         authorizationCodeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -65,10 +64,10 @@ public class Oauth {
     }
 
     private void loadTokens() {
-        //will be in a file
-        refreshToken = null;
-        accessToken = null;
-        tokenExpires = 0;
+        //have to be in a file
+        refreshToken = "1//0c5kqYS9Ilc7qCgYIARAAGAwSNwF-L9IrQPfAxAvljVGXslH8VB3ebOcm6JWWCcQDX6r_GvaLrOkDgYYSMBcrBC8PdAZjOXfcLSQ";
+        accessToken = "ya29.a0AfH6SMAL8nHWYgglIVoJTPXuHu1r54HympvojBscaUFU3PzPs7tyDU7Ax6gtRW0wMZdLwyF4Q0AsOzDiZflt7vESNEVphtzG78uEcGEmNmWqcUe3EUmYPlV7OVtHbmXJH36HoesVW2dS0aHgDxmIAN5kJv8s_9KFrcwT3LNxYrs";
+        tokenExpires = 1609265566522L;
     }
 
     private void obtainAuthorizationCode() {
@@ -114,27 +113,25 @@ public class Oauth {
     }
 
     private void manageWithAuthorizationCode() {
-        String request = buildExchangeRequest();
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(tokenUrl).openConnection();
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
-
-            PrintWriter printWriter = new PrintWriter(connection.getOutputStream());
-            printWriter.print(request);
-            printWriter.flush();
-            printWriter.close();
-            connection.connect();
-
-            HashMap<String, Object> result;
-            result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {
-            });
-            accessToken = (String) result.get("access_token");
-            refreshToken = (String) result.get("refresh_token");
-            tokenExpires = System.currentTimeMillis() + ((Number) result.get("expires_in")).intValue() * 1000;
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(authorizationCode != null && !authorizationCode.equals("")) {
+            try {
+                exchangeAuthorizationCodeForTokens();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    private void exchangeAuthorizationCodeForTokens() throws IOException {
+        String request = buildExchangeRequest();
+        HttpURLConnection connection = buildConnection(request);
+
+        HashMap<String, Object> result;
+        result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {
+        });
+        accessToken = (String) result.get("access_token");
+        refreshToken = (String) result.get("refresh_token");
+        tokenExpires = System.currentTimeMillis() + ((Number)result.get("expires_in")).intValue() * 1000;
     }
 
     private String buildExchangeRequest() {
@@ -145,10 +142,33 @@ public class Oauth {
                 "&grant_type=authorization_code";
     }
 
-    private void refreshAccessToken()  {
-        //refresh token method
+    private HttpURLConnection buildConnection(String request) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) new URL(tokenUrl).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestMethod("POST");
 
+        PrintWriter printWriter = new PrintWriter(connection.getOutputStream());
+        printWriter.print(request);
+        printWriter.flush();
+        printWriter.close();
+        connection.connect();
+        return connection;
     }
 
+    private void refreshAccessToken() throws IOException {
+        String request = buildRefreshTokenRequest();
+        HttpURLConnection connection = buildConnection(request);
 
+        HashMap<String, Object> result;
+        result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>(){});
+        accessToken = (String) result.get("access_token");
+        tokenExpires = System.currentTimeMillis() + ((Number)result.get("expires_in")).intValue() * 1000 - 5000;
+    }
+
+    private String buildRefreshTokenRequest() {
+        return "client_id=" + oauthClientId +
+                "&client_secret=" + oauthClientSecret +
+                "&refresh_token="+ refreshToken +
+                "&grant_type=refresh_token";
+    }
 }
