@@ -1,11 +1,16 @@
 package it.dawidwojdyla.controller.oauth;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.dawidwojdyla.EmailManager;
 import it.dawidwojdyla.controller.ObtainAuthorizationCodeWindowController;
 import it.dawidwojdyla.view.ViewFactory;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
 
 /**
  * Created by Dawid on 2020-12-27.
@@ -109,11 +114,39 @@ public class Oauth {
     }
 
     private void manageWithAuthorizationCode() {
-        //exchange authorization code for access and refresh tokens
+        String request = buildExchangeRequest();
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(tokenUrl).openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+
+            PrintWriter printWriter = new PrintWriter(connection.getOutputStream());
+            printWriter.print(request);
+            printWriter.flush();
+            printWriter.close();
+            connection.connect();
+
+            HashMap<String, Object> result;
+            result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {
+            });
+            accessToken = (String) result.get("access_token");
+            refreshToken = (String) result.get("refresh_token");
+            tokenExpires = System.currentTimeMillis() + ((Number) result.get("expires_in")).intValue() * 1000;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String buildExchangeRequest() {
+        return "code=" + authorizationCode +
+                "&client_id=" + oauthClientId +
+                "&client_secret=" + oauthClientSecret +
+                "&redirect_uri=" + redirectUri +
+                "&grant_type=authorization_code";
     }
 
     private void refreshAccessToken()  {
-        //refresh token mothod
+        //refresh token method
 
     }
 
