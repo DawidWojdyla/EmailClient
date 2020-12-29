@@ -10,6 +10,7 @@ import javafx.scene.web.WebView;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+
 /**
  * Created by Dawid on 2020-12-27.
  */
@@ -18,18 +19,16 @@ public class ObtainAuthorizationCodeWindowController extends AbstractController 
     @FXML
     private WebView webView;
 
-    private Oauth oauth;
-
-    public ObtainAuthorizationCodeWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName, Oauth oauth) {
+    public ObtainAuthorizationCodeWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
         super(emailManager, viewFactory, fxmlName);
-        this.oauth = oauth;
+    }
+
+    public WebView getWebView() {
+        return webView;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        oauth.listenForAuthorizationCode(webView);
-
+        //oauth.listenForAuthorizationCode(webView);
     }
-
-
 }
