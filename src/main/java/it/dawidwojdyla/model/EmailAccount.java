@@ -23,17 +23,10 @@ public class EmailAccount {
         this.session = session;
     }
 
-    public EmailAccount(String address, String password) {
+    public EmailAccount(String address, String password, Properties properties) {
         this.address = address;
         this.password = password;
-
-        properties = new Properties();
-        properties.put("incomingHost", "imap.gmail.com");
-        properties.put("mail.store.protocol", "imap");
-        properties.put("mail.transport.protocol", "smtps");
-        properties.put("mail.smtps.host", "smtp.gmail.com");
-        properties.put("mail.smtps.auth", "true");
-        properties.put("outgoingHost", "smtp.gmail.com");
+        this.properties = properties;
     }
 
     public String getAddress() {

@@ -8,6 +8,7 @@ import it.dawidwojdyla.view.ViewFactory;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,15 +24,16 @@ public class Main extends Application {
     private final EmailManager emailManager = new EmailManager();
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws IOException {
 
         ViewFactory viewFactory = new ViewFactory(emailManager);
+
         List<ValidAccount> validAccounts = persistenceAccess.loadFromPersistence();
         if (validAccounts.isEmpty()) {
             viewFactory.showLoginWindow();
         } else {
             for (ValidAccount account : validAccounts) {
-                EmailAccount emailAccount = new EmailAccount(account.getAddress(), account.getPassword());
+                EmailAccount emailAccount = new EmailAccount(account.getAddress(), account.getPassword(), account.getProperties());
                 LoginService loginService = new LoginService(emailAccount, emailManager);
                 loginService.start();
             }
@@ -43,7 +45,7 @@ public class Main extends Application {
     public void stop() {
         List<ValidAccount> validAccounts = new ArrayList<>();
         for (EmailAccount emailAccount: emailManager.getEmailAccounts()) {
-            validAccounts.add(new ValidAccount(emailAccount.getAddress(), emailAccount.getPassword()));
+            validAccounts.add(new ValidAccount(emailAccount.getAddress(), emailAccount.getPassword(), emailAccount.getProperties()));
         }
         persistenceAccess.saveToPersistence(validAccounts);
     }

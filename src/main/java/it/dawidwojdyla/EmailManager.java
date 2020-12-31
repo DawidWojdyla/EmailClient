@@ -60,6 +60,7 @@ public class EmailManager {
     private void setMailProperties() {
         setDefaultMailProperties();
         setOauthDefaultMailProperties();
+        setOauthProperties();
     }
 
     public void setDefaultMailProperties() {
@@ -80,12 +81,28 @@ public class EmailManager {
         mailProperties.put("oauthDefaultMailProperties", properties);
     }
 
+    private void setOauthProperties() {
+        Properties properties = new Properties();
+        properties.put("client_id", "1097648184338-d4h0ojjclgf4ng6ap7vgc4bbu2d3sfu1.apps.googleusercontent.com");
+        properties.put("client_secret", "AmB8QDH9NilclJNiwR_OJriI");
+        properties.put("authorization_server", "https://accounts.google.com/o/oauth2/v2/auth");
+        properties.put("scope", "https://mail.google.com/");
+        properties.put("token_server", "https://oauth2.googleapis.com/token");
+        properties.put("redirect_uri", "http://localhost/authorization-code/callback");
+
+        mailProperties.put("oauthProperties", properties);
+    }
+
     public Properties getOauthDefaultMailProperties() {
         return mailProperties.get("oauthDefaultMailProperties");
     }
 
     public Properties getDefaultMailProperties() {
         return mailProperties.get("defaultMailProperties");
+    }
+
+    public Properties getOauthProperties() {
+        return mailProperties.get("oauthProperties");
     }
 
     public void addEmailAccount(EmailAccount emailAccount) {

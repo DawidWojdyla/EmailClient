@@ -2,6 +2,7 @@ package it.dawidwojdyla.controller.oauth;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.dawidwojdyla.EmailManager;
+import it.dawidwojdyla.controller.LoginWindowController;
 import it.dawidwojdyla.controller.ObtainAuthorizationCodeWindowController;
 import it.dawidwojdyla.view.ViewFactory;
 import javafx.scene.web.WebView;
@@ -11,79 +12,50 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
-
-
+import java.util.Properties;
 
 /**
  * Created by Dawid on 2020-12-27.
  */
 public class Oauth {
 
-    private String oauthClientId;
-    private String oauthClientSecret;
-    private String refreshToken;
-    private String accessToken;
+    private Properties oauthProperties;
+    private Properties oauthTokens;
     private String authorizationCode;
-    private long tokenExpires;
-    private String tokenUrl;
-    private String authorizationCodeUrl;
-    private String scope;
-    private String securityToken;
-    private String redirectUri;
+    private EmailManager emailManager;
+    private ViewFactory viewFactory;
+    private LoginWindowController loginWindowController;
 
-    private final ViewFactory viewFactory;
-    private final EmailManager emailManager;
-
-    public Oauth(EmailManager emailManager, ViewFactory viewFactory) {
-        this.emailManager = emailManager;
-        this.viewFactory = viewFactory;
-        loadTokens();
-        loadCredentials();
+    public Oauth(LoginWindowController loginWindowController) {
+        this.loginWindowController = loginWindowController;
+        emailManager = loginWindowController.getEmailManager();
+        viewFactory = loginWindowController.getViewFactory();
+        oauthProperties = emailManager.getOauthProperties();
     }
 
-    public String getAccessToken() throws IOException {
-        if (accessToken == null || refreshToken == null) {
-            obtainAuthorizationCode();
-        } else if (System.currentTimeMillis() > tokenExpires) {
-            refreshAccessToken();
-        }
-        return accessToken;
+    public Oauth(Properties oauthProperties, Properties oauthTokens) {
+       this.oauthTokens = oauthTokens;
+       this.oauthProperties = oauthProperties;
     }
 
-    private void loadCredentials() {
-        //just for now
-        oauthClientId = "1097648184338-d4h0ojjclgf4ng6ap7vgc4bbu2d3sfu1.apps.googleusercontent.com";
-        oauthClientSecret = "AmB8QDH9NilclJNiwR_OJriI";
-        authorizationCodeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
-        scope = "https://mail.google.com/";
-        tokenUrl = "https://oauth2.googleapis.com/token";
-        redirectUri = "http://localhost/authorization-code/callback";
-
-        //should be generated :
-        securityToken = "security_token%3DALAMAKOTAKOTau3e1%26url%3Dhttps%3A%2F%2Foauth2.example.com%2Ftoken";
+    public Properties getOauthTokens() {
+        return oauthTokens;
     }
 
-    private void loadTokens() {
-        //have to be in a file
-        refreshToken = "1//0c5kqYS9Ilc7qCgYIARAAGAwSNwF-L9IrQPfAxAvljVGXslH8VB3ebOcm6JWWCcQDX6r_GvaLrOkDgYYSMBcrBC8PdAZjOXfcLSQ";
-        accessToken = "ya29.a0AfH6SMAL8nHWYgglIVoJTPXuHu1r54HympvojBscaUFU3PzPs7tyDU7Ax6gtRW0wMZdLwyF4Q0AsOzDiZflt7vESNEVphtzG78uEcGEmNmWqcUe3EUmYPlV7OVtHbmXJH36HoesVW2dS0aHgDxmIAN5kJv8s_9KFrcwT3LNxYrs";
-        tokenExpires = 1609265566522L;
+    public void obtainAuthorizationCode() {
+            ObtainAuthorizationCodeWindowController authorizationCodeWindowController =
+                    new ObtainAuthorizationCodeWindowController(emailManager, viewFactory, "ObtainAuthorizationCodeWindow.fxml");
+            viewFactory.showObtainAuthorizationCodeWindow(authorizationCodeWindowController);
+            listenForAuthorizationCode(authorizationCodeWindowController.getWebView());
     }
 
-    private void obtainAuthorizationCode() {
-        ObtainAuthorizationCodeWindowController authorizationCodeWindowController =
-                new ObtainAuthorizationCodeWindowController(emailManager, viewFactory, "ObtainAuthorizationCodeWindow.fxml");
-        viewFactory.showObtainAuthorizationCodeWindow(authorizationCodeWindowController);
-        listenForAuthorizationCode(authorizationCodeWindowController.getWebView());
-    }
-
-    public void listenForAuthorizationCode(WebView webView) {
+    private void listenForAuthorizationCode(WebView webView) {
         System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
         Stage stage = (Stage) webView.getScene().getWindow();
         stage.setOnCloseRequest(e -> manageWithAuthorizationCode());
 
         webView.getEngine().locationProperty().addListener((observableValue, oldAddress, newAddress) -> {
-            if(newAddress.startsWith(redirectUri)) {
+            if(newAddress.startsWith(oauthProperties.getProperty("redirect_uri"))) {
                 if (!newAddress.contains("error")) {
                     authorizationCode = extractAuthorizationCodeFromURL(newAddress);
                 }
@@ -95,12 +67,13 @@ public class Oauth {
     }
 
     private String buildAuthorizationURL() {
-        return authorizationCodeUrl +
-                "?scope=" + scope +
+        return oauthProperties.getProperty("authorization_server") +
+                "?scope=" + oauthProperties.getProperty("scope") +
                 "&response_type=code" +
-                "&state=" + securityToken +
-                "&redirect_uri=" + redirectUri +
-                "&client_id=" + oauthClientId;
+                //"&state=" + securityToken +
+                "&login_hint=" + loginWindowController.getEmailAddress() +
+                "&redirect_uri=" + oauthProperties.getProperty("redirect_uri") +
+                "&client_id=" + oauthProperties.getProperty("client_id");
     }
 
     private String extractAuthorizationCodeFromURL(String url) {
@@ -129,21 +102,25 @@ public class Oauth {
         HashMap<String, Object> result;
         result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {
         });
-        accessToken = (String) result.get("access_token");
-        refreshToken = (String) result.get("refresh_token");
-        tokenExpires = System.currentTimeMillis() + ((Number)result.get("expires_in")).intValue() * 1000;
+        oauthTokens = new Properties();
+        oauthTokens.put("access_token", result.get("access_token"));
+        oauthTokens.put("refresh_token", result.get("refresh_token"));
+        long tokenExpires = (System.currentTimeMillis() + ((Number)result.get("expires_in")).intValue() * 1000 - 5000);
+        oauthTokens.put("token_expires", tokenExpires + "");
+
+        loginWindowController.logUsingOAuth(oauthTokens);
     }
 
     private String buildExchangeRequest() {
         return "code=" + authorizationCode +
-                "&client_id=" + oauthClientId +
-                "&client_secret=" + oauthClientSecret +
-                "&redirect_uri=" + redirectUri +
+                "&client_id=" + oauthProperties.getProperty("client_id") +
+                "&client_secret=" + oauthProperties.getProperty("client_secret") +
+                "&redirect_uri=" + oauthProperties.getProperty("redirect_uri") +
                 "&grant_type=authorization_code";
     }
 
     private HttpURLConnection buildConnection(String request) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(tokenUrl).openConnection();
+        HttpURLConnection connection = (HttpURLConnection) new URL(oauthProperties.getProperty("token_server")).openConnection();
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
 
@@ -161,14 +138,15 @@ public class Oauth {
 
         HashMap<String, Object> result;
         result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>(){});
-        accessToken = (String) result.get("access_token");
-        tokenExpires = System.currentTimeMillis() + ((Number)result.get("expires_in")).intValue() * 1000 - 5000;
+        oauthTokens.put("access_token", result.get("access_token"));
+        long tokenExpires = (System.currentTimeMillis() + ((Number)result.get("expires_in")).intValue() * 1000 - 5000);
+        oauthTokens.put("token_expires", tokenExpires + "");
     }
 
     private String buildRefreshTokenRequest() {
-        return "client_id=" + oauthClientId +
-                "&client_secret=" + oauthClientSecret +
-                "&refresh_token="+ refreshToken +
+        return "client_id=" + oauthProperties.getProperty("client_id") +
+                "&client_secret=" + oauthProperties.getProperty("client_secret") +
+                "&refresh_token="+ oauthTokens.getProperty("refresh_token")+
                 "&grant_type=refresh_token";
     }
 }

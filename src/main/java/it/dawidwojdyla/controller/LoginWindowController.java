@@ -5,14 +5,9 @@ import it.dawidwojdyla.controller.oauth.Oauth;
 import it.dawidwojdyla.controller.services.LoginService;
 import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.view.ViewFactory;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -23,6 +18,9 @@ import java.util.ResourceBundle;
  * Created by Dawid on 2020-11-26.
  */
 public class LoginWindowController extends AbstractController implements Initializable {
+
+    @FXML
+    private Button loginButton;
 
     @FXML
     private TextField emailAddressField;
@@ -50,45 +48,70 @@ public class LoginWindowController extends AbstractController implements Initial
         super(emailManager, viewFactory, fxmlName);
     }
 
+    public String getEmailAddress() {
+        return emailAddressField.getText();
+    }
+
+    public EmailManager getEmailManager() {
+        return emailManager;
+    }
+
+    public ViewFactory getViewFactory() {
+        return viewFactory;
+    }
+
     @FXML
     void loginButtonActon() {
+        errorLabel.setText("");
 
         if(fieldsAreValid()) {
-
-            Properties properties = new Properties();
-            properties.put("incomingHost", incomingHostField.getText());
-            properties.put("outgoingHost", outgoingHostField.getText());
-
             if (oauthCheckBox.isSelected()) {
-                properties.putAll(emailManager.getOauthDefaultMailProperties());
-                //manage with oauth authorization
+                Oauth oauth = new Oauth(this);
+                oauth.obtainAuthorizationCode();
             } else {
+                Properties properties = new Properties();
                 properties.putAll(emailManager.getDefaultMailProperties());
+                logInToNewAccount(properties);
             }
-
-            EmailAccount emailAccount = new EmailAccount(emailAddressField.getText(), passwordField.getText(), properties);
-            LoginService loginService = new LoginService(emailAccount, emailManager);
-            loginService.start();
-            loginService.setOnSucceeded(event -> {
-                EmailLoginResult emailLoginResult = loginService.getValue();
-                switch(emailLoginResult) {
-                    case SUCCESS:
-                        if(!viewFactory.isMainViewInitialized()) {
-                            viewFactory.showMainWindow();
-                        }
-                        Stage stage = (Stage) errorLabel.getScene().getWindow();
-                        viewFactory.closeStage(stage);
-                        return;
-                    case FAILED_BY_CREDENTIALS:
-                        errorLabel.setText("Invalid credencials!");
-                        return;
-                    case FAILED_BY_UNEXPECTED_ERROR:
-                        errorLabel.setText("Unexpected error!");
-                        return;
-                    default:
-                }
-            });
         }
+    }
+
+    public void logUsingOAuth(Properties oauthTokens) {
+        if(oauthTokens.getProperty("access_token").equals("")) {
+            errorLabel.setText("Couldn't get accessToken");
+        } else {
+            Properties properties = new Properties();
+            properties.putAll(emailManager.getOauthDefaultMailProperties());
+            properties.putAll(oauthTokens);
+            logInToNewAccount(properties);
+        }
+    }
+
+    private void logInToNewAccount(Properties properties) {
+        properties.put("incomingHost", incomingHostField.getText());
+        properties.put("outgoingHost", outgoingHostField.getText());
+        EmailAccount emailAccount = new EmailAccount(emailAddressField.getText(), passwordField.getText(), properties);
+        LoginService loginService = new LoginService(emailAccount, emailManager);
+        loginService.start();
+        loginService.setOnSucceeded(event -> {
+            EmailLoginResult emailLoginResult = loginService.getValue();
+            switch(emailLoginResult) {
+                case SUCCESS:
+                    if(!viewFactory.isMainViewInitialized()) {
+                        viewFactory.showMainWindow();
+                    }
+                    Stage stage = (Stage) errorLabel.getScene().getWindow();
+                    viewFactory.closeStage(stage);
+                    return;
+                case FAILED_BY_CREDENTIALS:
+                    errorLabel.setText("Invalid credencials!");
+                    return;
+                case FAILED_BY_UNEXPECTED_ERROR:
+                    errorLabel.setText("Unexpected error!");
+                    return;
+                default:
+            }
+        });
     }
 
     private boolean fieldsAreValid() {
@@ -104,7 +127,6 @@ public class LoginWindowController extends AbstractController implements Initial
         }
 
         return true;
-
     }
 
     @Override

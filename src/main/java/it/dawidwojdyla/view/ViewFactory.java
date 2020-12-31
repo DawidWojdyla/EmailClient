@@ -88,6 +88,10 @@ public class ViewFactory {
         initializeStage(controller,true);
     }
 
+    public void showObtainAuthorizationCodeWindow (AbstractController controller) {
+        initializeStage(controller, false);
+    }
+
     private void initializeStage(AbstractController controller, boolean resizable) {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getClassLoader().getResource("fxml/" + controller.getFxmlName()));
         fxmlLoader.setController(controller);
@@ -122,11 +126,10 @@ public class ViewFactory {
         }
     }
 
-    private void updateStyle(Scene scene){
+    private void updateStyle(Scene scene) {
         scene.getStylesheets().clear();
         scene.getStylesheets().add(Main.class.getClassLoader().getResource("css/default.css").toExternalForm());
         scene.getStylesheets().add(Main.class.getClassLoader().getResource(ColorTheme.getCssPath(colorTheme)).toExternalForm());
         scene.getStylesheets().add(Main.class.getClassLoader().getResource(FontSize.getCssPath(fontSize)).toExternalForm());
     }
-
 }
