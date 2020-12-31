@@ -20,7 +20,7 @@ import java.util.Properties;
 public class Oauth {
 
     private Properties oauthProperties;
-    private Properties oauthTokens;
+    private Properties accountProperties;
     private String authorizationCode;
     private EmailManager emailManager;
     private ViewFactory viewFactory;
@@ -33,13 +33,9 @@ public class Oauth {
         oauthProperties = emailManager.getOauthProperties();
     }
 
-    public Oauth(Properties oauthProperties, Properties oauthTokens) {
-       this.oauthTokens = oauthTokens;
+    public Oauth(Properties oauthProperties, Properties accountProperties) {
+       this.accountProperties = accountProperties;
        this.oauthProperties = oauthProperties;
-    }
-
-    public Properties getOauthTokens() {
-        return oauthTokens;
     }
 
     public void obtainAuthorizationCode() {
@@ -102,7 +98,7 @@ public class Oauth {
         HashMap<String, Object> result;
         result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {
         });
-        oauthTokens = new Properties();
+        Properties oauthTokens = new Properties();
         oauthTokens.put("access_token", result.get("access_token"));
         oauthTokens.put("refresh_token", result.get("refresh_token"));
         long tokenExpires = (System.currentTimeMillis() + ((Number)result.get("expires_in")).intValue() * 1000 - 5000);
@@ -133,20 +129,21 @@ public class Oauth {
     }
 
     private void refreshAccessToken() throws IOException {
-        String request = buildRefreshTokenRequest();
-        HttpURLConnection connection = buildConnection(request);
+            String request = buildRefreshTokenRequest();
+            HttpURLConnection connection = buildConnection(request);
 
-        HashMap<String, Object> result;
-        result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>(){});
-        oauthTokens.put("access_token", result.get("access_token"));
-        long tokenExpires = (System.currentTimeMillis() + ((Number)result.get("expires_in")).intValue() * 1000 - 5000);
-        oauthTokens.put("token_expires", tokenExpires + "");
+            HashMap<String, Object> result;
+            result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {
+            });
+            accountProperties.put("access_token", result.get("access_token"));
+            long tokenExpires = (System.currentTimeMillis() + ((Number) result.get("expires_in")).intValue() * 1000 - 5000);
+            accountProperties.put("token_expires", tokenExpires + "");
     }
 
     private String buildRefreshTokenRequest() {
         return "client_id=" + oauthProperties.getProperty("client_id") +
                 "&client_secret=" + oauthProperties.getProperty("client_secret") +
-                "&refresh_token="+ oauthTokens.getProperty("refresh_token")+
+                "&refresh_token="+ accountProperties.getProperty("refresh_token")+
                 "&grant_type=refresh_token";
     }
 }

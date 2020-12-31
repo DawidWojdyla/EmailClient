@@ -1,11 +1,14 @@
 package it.dawidwojdyla.controller;
 
 import it.dawidwojdyla.EmailManager;
+import it.dawidwojdyla.controller.oauth.Oauth;
 import it.dawidwojdyla.controller.services.EmailSenderService;
 import it.dawidwojdyla.controller.services.MessageRendererService;
 import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.view.ViewFactory;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -67,6 +70,36 @@ public class ComposeMessageWindowController extends AbstractController implement
     @FXML
     void sendButtonAction() {
         progresIndicatorPane.setVisible(true);
+
+        EmailAccount emailAccount = emailAccountChoiceBox.getValue();
+        if (emailAccount.getProperties().containsValue("XOAUTH2")) {
+            long tokenExpires = Long.parseLong(emailAccount.getProperties().getProperty("token_expires"));
+            if(System.currentTimeMillis() > tokenExpires) {
+                Oauth oauth = new Oauth(emailManager.getOauthProperties(), emailAccount.getProperties());
+                //here should be a service i think
+                Service<Void> service = new Service<>() {
+                    @Override
+                    protected Task<Void> createTask() {
+                        return new Task<> () {
+                            @Override
+                            protected Void call() {
+                                oauth.obtainAuthorizationCode();
+                                return null;
+                            }
+                        };
+                    }
+                };
+                service.setOnSucceeded(e -> sendMessage());
+
+            } else {
+                sendMessage();
+            }
+        } else {
+            sendMessage();
+        }
+    }
+
+    private void sendMessage() {
         EmailSenderService emailSenderService = new EmailSenderService(
                 emailAccountChoiceBox.getValue(),
                 subjectTextField.getText(),

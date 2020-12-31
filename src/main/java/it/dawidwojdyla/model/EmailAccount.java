@@ -41,10 +41,6 @@ public class EmailAccount {
         return properties;
     }
 
-    public void setProperties(Properties properties) {
-        this.properties = properties;
-    }
-
     public Store getStore() {
         return store;
     }
