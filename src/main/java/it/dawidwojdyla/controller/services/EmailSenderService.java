@@ -4,7 +4,6 @@ import it.dawidwojdyla.controller.EmailSendingResult;
 import it.dawidwojdyla.model.EmailAccount;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -13,8 +12,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -47,22 +44,12 @@ public class EmailSenderService extends Service<EmailSendingResult> {
             protected EmailSendingResult call() {
                 try {
                     MimeMessage mimeMessage = new MimeMessage(emailAccount.getSession());
-                    mimeMessage.setFrom(emailAccount.getAddress());
-                    mimeMessage.addRecipients(Message.RecipientType.TO, recipient);
-                    mimeMessage.setSubject(subject);
-
-                    Multipart multipart = new MimeMultipart();
-                    BodyPart messageBodyPart = new MimeBodyPart();
-                    messageBodyPart.setContent(messageContent, "text/html; charset=UTF-8");
-                    multipart.addBodyPart(messageBodyPart);
-                    addAttachments(multipart);
-                    mimeMessage.setContent(multipart);
-
+                    buildMessage(mimeMessage);
                     Transport transport = emailAccount.getSession().getTransport();
                     transport.connect(
                             emailAccount.getProperties().getProperty("outgoingHost"),
                             emailAccount.getAddress(),
-                            emailAccount.getPassword());
+                            getAuthenticator());
                     transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients());
                     transport.close();
                 } catch (Exception e) {
@@ -70,6 +57,19 @@ public class EmailSenderService extends Service<EmailSendingResult> {
                     return EmailSendingResult.FAILED_BY_UNEXPECTED_ERROR;
                 }
                 return EmailSendingResult.SUCCESS;
+            }
+
+            private void buildMessage(MimeMessage mimeMessage) throws MessagingException {
+                mimeMessage.setFrom(emailAccount.getAddress());
+                mimeMessage.addRecipients(Message.RecipientType.TO, recipient);
+                mimeMessage.setSubject(subject);
+
+                Multipart multipart = new MimeMultipart();
+                BodyPart messageBodyPart = new MimeBodyPart();
+                messageBodyPart.setContent(messageContent, "text/html; charset=UTF-8");
+                multipart.addBodyPart(messageBodyPart);
+                addAttachments(multipart);
+                mimeMessage.setContent(multipart);
             }
 
             private void addAttachments(Multipart multipart) throws MessagingException {
@@ -87,5 +87,13 @@ public class EmailSenderService extends Service<EmailSendingResult> {
                 }
             }
         };
+    }
+
+    private String getAuthenticator() {
+        if (emailAccount.getProperties().containsValue("XOAUTH2")) {
+          return  emailAccount.getProperties().getProperty("access_token");
+        } else {
+            return emailAccount.getPassword();
+        }
     }
 }

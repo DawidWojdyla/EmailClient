@@ -71,7 +71,7 @@ public class LoginWindowController extends AbstractController implements Initial
             } else {
                 Properties properties = new Properties();
                 properties.putAll(emailManager.getDefaultMailProperties());
-                logInToNewAccount(properties);
+                logInToNewAccount(properties, false);
             }
         }
     }
@@ -83,15 +83,15 @@ public class LoginWindowController extends AbstractController implements Initial
             Properties properties = new Properties();
             properties.putAll(emailManager.getOauthDefaultMailProperties());
             properties.putAll(oauthTokens);
-            logInToNewAccount(properties);
+            logInToNewAccount(properties, true);
         }
     }
 
-    private void logInToNewAccount(Properties properties) {
+    private void logInToNewAccount(Properties properties, boolean isOauth) {
         properties.put("incomingHost", incomingHostField.getText());
         properties.put("outgoingHost", outgoingHostField.getText());
         EmailAccount emailAccount = new EmailAccount(emailAddressField.getText(), passwordField.getText(), properties);
-        LoginService loginService = new LoginService(emailAccount, emailManager);
+        LoginService loginService = new LoginService(emailAccount, emailManager, isOauth);
         loginService.start();
         loginService.setOnSucceeded(event -> {
             EmailLoginResult emailLoginResult = loginService.getValue();

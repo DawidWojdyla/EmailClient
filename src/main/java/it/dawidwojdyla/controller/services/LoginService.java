@@ -15,29 +15,40 @@ public class LoginService extends Service<EmailLoginResult> {
 
     EmailAccount emailAccount;
     EmailManager emailManager;
+    boolean isOauth;
 
-    public LoginService(EmailAccount emailAccount, EmailManager emailManager) {
+    public LoginService(EmailAccount emailAccount, EmailManager emailManager, boolean isOauth) {
         this.emailAccount = emailAccount;
         this.emailManager = emailManager;
+        this.isOauth = isOauth;
     }
 
     private EmailLoginResult login() {
-        Authenticator authenticator = new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(emailAccount.getAddress(), emailAccount.getPassword());
-            }
-        };
-
+        Session session;
+        Store store;
         try {
-            Session session = Session.getInstance(emailAccount.getProperties(), authenticator);
-            Store store = session.getStore("imaps");
-            store.connect(emailAccount.getProperties().getProperty("incomingHost"),
-                    emailAccount.getAddress(),
-                    emailAccount.getPassword());
+            if (isOauth) {
+                session = Session.getInstance(emailAccount.getProperties());
+                store = session.getStore("imap");
+                store.connect(emailAccount.getProperties().getProperty("incomingHost"),
+                        emailAccount.getAddress(),
+                        emailAccount.getProperties().getProperty("access_token"));
+            } else {
+                Authenticator authenticator = new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(emailAccount.getAddress(), emailAccount.getPassword());
+                    }
+                };
+                session = Session.getInstance(emailAccount.getProperties(), authenticator);
+                store = session.getStore("imaps");
+                store.connect(emailAccount.getProperties().getProperty("incomingHost"),
+                        emailAccount.getAddress(),
+                        emailAccount.getPassword());
+            }
             emailAccount.setStore(store);
-            emailManager.addEmailAccount(emailAccount);
             emailAccount.setSession(session);
+            emailManager.addEmailAccount(emailAccount);
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
             return EmailLoginResult.FAILED_BY_NETWORK;
@@ -56,9 +67,9 @@ public class LoginService extends Service<EmailLoginResult> {
 
     @Override
     protected Task<EmailLoginResult> createTask() {
-        return new Task<EmailLoginResult>() {
+        return new Task<>() {
             @Override
-            protected EmailLoginResult call() throws Exception {
+            protected EmailLoginResult call() {
                 return login();
             }
         };

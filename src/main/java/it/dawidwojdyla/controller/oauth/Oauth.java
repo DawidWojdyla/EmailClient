@@ -92,6 +92,7 @@ public class Oauth {
     }
 
     private void exchangeAuthorizationCodeForTokens() throws IOException {
+        System.out.println("start exchanging auth code for tokens");
         String request = buildExchangeRequest();
         HttpURLConnection connection = buildConnection(request);
 
@@ -103,7 +104,7 @@ public class Oauth {
         oauthTokens.put("refresh_token", result.get("refresh_token"));
         long tokenExpires = (System.currentTimeMillis() + ((Number)result.get("expires_in")).intValue() * 1000 - 5000);
         oauthTokens.put("token_expires", tokenExpires + "");
-
+        System.out.println("finished exchanging auth code for tokens");
         loginWindowController.logUsingOAuth(oauthTokens);
     }
 
@@ -128,16 +129,18 @@ public class Oauth {
         return connection;
     }
 
-    private void refreshAccessToken() throws IOException {
-            String request = buildRefreshTokenRequest();
-            HttpURLConnection connection = buildConnection(request);
+    public void refreshAccessToken() throws IOException {
+        System.out.println("start refreshing token");
+        String request = buildRefreshTokenRequest();
+        HttpURLConnection connection = buildConnection(request);
 
-            HashMap<String, Object> result;
-            result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {
-            });
-            accountProperties.put("access_token", result.get("access_token"));
-            long tokenExpires = (System.currentTimeMillis() + ((Number) result.get("expires_in")).intValue() * 1000 - 5000);
-            accountProperties.put("token_expires", tokenExpires + "");
+        HashMap<String, Object> result;
+        result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {
+        });
+        accountProperties.put("access_token", result.get("access_token"));
+        long tokenExpires = (System.currentTimeMillis() + ((Number) result.get("expires_in")).intValue() * 1000 - 5000);
+        accountProperties.put("token_expires", tokenExpires + "");
+        System.out.println("finished refreshing token");
     }
 
     private String buildRefreshTokenRequest() {

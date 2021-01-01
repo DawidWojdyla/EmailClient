@@ -76,7 +76,6 @@ public class ComposeMessageWindowController extends AbstractController implement
             long tokenExpires = Long.parseLong(emailAccount.getProperties().getProperty("token_expires"));
             if(System.currentTimeMillis() > tokenExpires) {
                 Oauth oauth = new Oauth(emailManager.getOauthProperties(), emailAccount.getProperties());
-                //here should be a service i think
                 Service<Void> service = new Service<>() {
                     @Override
                     protected Task<Void> createTask() {
@@ -90,7 +89,7 @@ public class ComposeMessageWindowController extends AbstractController implement
                     }
                 };
                 service.setOnSucceeded(e -> sendMessage());
-
+                service.start();
             } else {
                 sendMessage();
             }
