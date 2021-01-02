@@ -48,7 +48,10 @@ public class Oauth {
     private void listenForAuthorizationCode(WebView webView) {
         System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
         Stage stage = (Stage) webView.getScene().getWindow();
-        stage.setOnCloseRequest(e -> manageWithAuthorizationCode());
+        stage.setOnCloseRequest(e -> {
+            manageWithAuthorizationCode();
+            loginWindowController.enableLoginAction();
+        });
 
         webView.getEngine().locationProperty().addListener((observableValue, oldAddress, newAddress) -> {
             if(newAddress.startsWith(oauthProperties.getProperty("redirect_uri"))) {
@@ -73,7 +76,7 @@ public class Oauth {
     }
 
     private String extractAuthorizationCodeFromURL(String url) {
-        String authorizationCode = "";
+        String authorizationCode;
         authorizationCode = url.substring(url.indexOf("code=") + 5);
         if (authorizationCode.contains("&")) {
             authorizationCode = authorizationCode.substring(0, authorizationCode.indexOf("&"));
@@ -92,7 +95,6 @@ public class Oauth {
     }
 
     private void exchangeAuthorizationCodeForTokens() throws IOException {
-        System.out.println("start exchanging auth code for tokens");
         String request = buildExchangeRequest();
         HttpURLConnection connection = buildConnection(request);
 
@@ -104,7 +106,6 @@ public class Oauth {
         oauthTokens.put("refresh_token", result.get("refresh_token"));
         long tokenExpires = (System.currentTimeMillis() + ((Number)result.get("expires_in")).intValue() * 1000 - 5000);
         oauthTokens.put("token_expires", tokenExpires + "");
-        System.out.println("finished exchanging auth code for tokens");
         loginWindowController.logUsingOAuth(oauthTokens);
     }
 
@@ -130,7 +131,6 @@ public class Oauth {
     }
 
     public void refreshAccessToken() throws IOException {
-        System.out.println("start refreshing token");
         String request = buildRefreshTokenRequest();
         HttpURLConnection connection = buildConnection(request);
 
@@ -140,7 +140,6 @@ public class Oauth {
         accountProperties.put("access_token", result.get("access_token"));
         long tokenExpires = (System.currentTimeMillis() + ((Number) result.get("expires_in")).intValue() * 1000 - 5000);
         accountProperties.put("token_expires", tokenExpires + "");
-        System.out.println("finished refreshing token");
     }
 
     private String buildRefreshTokenRequest() {

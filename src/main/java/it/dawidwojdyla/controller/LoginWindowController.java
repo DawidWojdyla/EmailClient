@@ -43,9 +43,16 @@ public class LoginWindowController extends AbstractController implements Initial
     @FXML
     private CheckBox manualHostCheckBox;
 
+    boolean isLoginActionBlocked = false;
+
 
     public LoginWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
         super(emailManager, viewFactory, fxmlName);
+    }
+
+    public void enableLoginAction() {
+        isLoginActionBlocked = false;
+        errorLabel.setText("");
     }
 
     public String getEmailAddress() {
@@ -62,17 +69,22 @@ public class LoginWindowController extends AbstractController implements Initial
 
     @FXML
     void loginButtonActon() {
-        errorLabel.setText("");
+        if (!isLoginActionBlocked) {
+            errorLabel.setText("");
 
-        if(fieldsAreValid()) {
-            if (oauthCheckBox.isSelected()) {
-                Oauth oauth = new Oauth(this);
-                oauth.obtainAuthorizationCode();
-            } else {
-                Properties properties = new Properties();
-                properties.putAll(emailManager.getDefaultMailProperties());
-                logInToNewAccount(properties, false);
+            if (fieldsAreValid()) {
+                if (oauthCheckBox.isSelected()) {
+                    isLoginActionBlocked = true;
+                    Oauth oauth = new Oauth(this);
+                    oauth.obtainAuthorizationCode();
+                } else {
+                    Properties properties = new Properties();
+                    properties.putAll(emailManager.getDefaultMailProperties());
+                    logInToNewAccount(properties, false);
+                }
             }
+        } else {
+            errorLabel.setText("OAuth2 authorization flow in progress...");
         }
     }
 
@@ -85,6 +97,7 @@ public class LoginWindowController extends AbstractController implements Initial
             properties.putAll(oauthTokens);
             logInToNewAccount(properties, true);
         }
+        isLoginActionBlocked = false;
     }
 
     private void logInToNewAccount(Properties properties, boolean isOauth) {
