@@ -10,7 +10,6 @@ import javafx.application.Application;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,6 @@ public class Main extends Application {
                 if (emailAccount.getProperties().containsValue("XOAUTH2")) {
                     long tokenExpires = Long.parseLong(emailAccount.getProperties().getProperty("token_expires"));
                     if (System.currentTimeMillis() > tokenExpires) {
-                        System.out.println("Main window: valid account -> token expires..");
                         Oauth oauth = new Oauth(emailManager.getOauthProperties(), emailAccount.getProperties());
                         Service<Void> service = new Service<>() {
                             @Override

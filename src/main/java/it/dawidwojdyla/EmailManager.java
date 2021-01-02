@@ -8,7 +8,6 @@ import it.dawidwojdyla.model.EmailTreeItem;
 import it.dawidwojdyla.view.IconResolver;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import javax.mail.Flags;
 import javax.mail.Folder;
 import java.util.ArrayList;

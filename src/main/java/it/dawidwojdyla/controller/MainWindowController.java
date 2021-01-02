@@ -6,6 +6,7 @@ import it.dawidwojdyla.model.EmailMessage;
 import it.dawidwojdyla.model.EmailTreeItem;
 import it.dawidwojdyla.model.SizeInteger;
 import it.dawidwojdyla.view.ViewFactory;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -77,6 +78,11 @@ public class MainWindowController extends AbstractController implements Initiali
     @FXML
     void composeMessageAction() {
         viewFactory.showComposeMessageWindow(ComposeMessageType.DEFAULT);
+    }
+
+    @FXML
+    void closeAction() {
+        Platform.exit();
     }
 
     @Override
