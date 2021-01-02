@@ -9,19 +9,20 @@ import java.util.List;
 /**
  * Created by Dawid on 2020-12-04.
  */
-public class FolderUpdaterService extends Service {
+public class FolderUpdaterService extends Service<Void> {
 
-    private List<Folder> folderList;
+    private final List<Folder> folderList;
 
     public FolderUpdaterService(List<Folder> folderList) {
         this.folderList = folderList;
     }
 
     @Override
-    protected Task createTask() {
-        return new Task() {
+    protected Task<Void> createTask() {
+        return new Task<>() {
             @Override
-            protected Object call() throws Exception {
+            protected Void call() throws Exception {
+                Thread.sleep(5000);
                 for(;;) {
                     try {
                         Thread.sleep(5000);
