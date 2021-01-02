@@ -3,7 +3,6 @@ package it.dawidwojdyla.model;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
-
 import javax.mail.Flags;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -14,15 +13,14 @@ import javax.mail.internet.MimeMessage;
  */
 public class EmailTreeItem<String> extends TreeItem<String> {
 
-    private String name;
-    private ObservableList<EmailMessage> emailMessages;
+    private final String name;
+    private final ObservableList<EmailMessage> emailMessages;
     private int unreadMessagesCount;
 
     public EmailTreeItem(String name) {
         super(name);
         this.name = name;
         this.emailMessages = FXCollections.observableArrayList();
-
     }
 
     public ObservableList<EmailMessage> getEmailMessages() {
