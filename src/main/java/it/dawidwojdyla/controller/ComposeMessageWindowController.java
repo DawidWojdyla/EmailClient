@@ -19,10 +19,10 @@ import javafx.scene.text.TextFlow;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,8 +81,8 @@ public class ComposeMessageWindowController extends AbstractController implement
                     protected Task<Void> createTask() {
                         return new Task<> () {
                             @Override
-                            protected Void call() {
-                                oauth.obtainAuthorizationCode();
+                            protected Void call() throws IOException {
+                                oauth.refreshAccessToken();
                                 return null;
                             }
                         };
@@ -140,8 +140,6 @@ public class ComposeMessageWindowController extends AbstractController implement
 
         Button closingButton = new Button("x");
         closingButton.getStyleClass().add("attachRemoveButton");
-        //closingButton.setStyle("-fx-base: #f3622d; -fx-margin:1px; -fx-padding: -1px 4px 1px 4px; -fx-font-weight: bold; -fx-cursor: hand;");
-
         closingButton.setOnAction(e -> {
             attachmentList.remove(attachment);
             attachHBox.getChildren().remove(attachmentTextFlow);
