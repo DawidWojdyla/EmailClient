@@ -2,7 +2,6 @@ package it.dawidwojdyla.controller.services;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-
 import javax.mail.Folder;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class FolderUpdaterService extends Service<Void> {
         return new Task<>() {
             @Override
             protected Void call() throws Exception {
-                Thread.sleep(5000);
+                Thread.sleep(10000);
                 for(;;) {
                     try {
                         Thread.sleep(5000);
