@@ -9,6 +9,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -33,8 +34,6 @@ public class AccountSettingsWindowController extends AbstractController implemen
     @FXML
     private CheckBox oauthCheckBox;
 
-    @FXML
-    private CheckBox manualHostCheckBox;
 
     public AccountSettingsWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
         super(emailManager, viewFactory, fxmlName);
@@ -42,16 +41,60 @@ public class AccountSettingsWindowController extends AbstractController implemen
 
     @FXML
     void applyButtonAction() {
+        EmailAccount emailAccount = emailAccountChoiceBox.getValue();
+        if (oauthCheckBox.isSelected()) {
+            //OAUTH
 
+            if (emailAccount.getProperties().containsValue("XOAUTH2")) {
+                //OAUTH -> OAUTH
+                if(!emailAccount.getPassword().equals(passwordField.getText())) {
+                    //new authorization needed then relog
+
+                } else if (!incomingHostField.getText().equals(emailAccount.getProperties().getProperty("incomingHost")) ||
+                        !outgoingHostField.getText().equals(emailAccount.getProperties().getProperty("outgoingHost"))) {
+                    //relog
+                }
+            } else {
+                //NoOauth -> oauth
+
+                //remove oauthMailProperties and add noOauthDefaultProperties
+
+                if (!emailAccount.getProperties().containsKey("refresh_token") || !emailAccount.getPassword().equals(passwordField.getText())) {
+                    //new authorization needed then relog
+                } else {
+                    //refresh access_token if needed then relog
+                }
+            }
+        } else {
+            //NoOauth
+
+            if (emailAccount.getProperties().containsValue("XOAUTH2")) {
+                //Oauth -> NoOauth
+
+                //remove oauthMailProperties and add noOauthDefaultProperties and relog
+                //NoOauth -> NoOauth
+            } else if (!passwordField.getText().equals(emailAccount.getPassword()) ||
+                    !incomingHostField.getText().equals(emailAccount.getProperties().getProperty("incomingHost")) ||
+                    !outgoingHostField.getText().equals(emailAccount.getProperties().getProperty("outgoingHost"))){
+                //relog
+            }
+        }
     }
 
     @FXML
     void cancelButtonAction() {
-
+        viewFactory.closeStage((Stage) oauthCheckBox.getScene().getWindow());
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        emailAccountChoiceBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldChoice, newChoice) -> {
+            passwordField.setText(newChoice.getPassword());
+            incomingHostField.setText(newChoice.getProperties().getProperty("incomingHost"));
+            outgoingHostField.setText(newChoice.getProperties().getProperty("outgoingHost"));
+            oauthCheckBox.setSelected(newChoice.getProperties().containsValue("XOAUTH2"));
+        });
+        emailAccountChoiceBox.setItems(emailManager.getEmailAccounts());
+        emailAccountChoiceBox.setValue(emailManager.getEmailAccounts().get(0));
     }
 }

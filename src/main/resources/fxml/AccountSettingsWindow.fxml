@@ -8,19 +8,17 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane prefHeight="467.0" prefWidth="471.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="450.0" prefWidth="471.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label layoutX="30.0" layoutY="24.0" prefHeight="33.0" prefWidth="57.0" text="Account" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" />
       <ChoiceBox fx:id="emailAccountChoiceBox" layoutX="90.0" layoutY="46.0" prefHeight="33.0" prefWidth="309.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
-      <Label layoutX="39.0" layoutY="173.0" prefHeight="33.0" prefWidth="88.0" text="Password" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="90.0" />
-      <PasswordField fx:id="passwordField" layoutX="156.0" layoutY="173.0" prefHeight="33.0" prefWidth="310.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="90.0" />
-      <TextField fx:id="incomingHostField" layoutX="268.0" layoutY="226.0" prefHeight="33.0" prefWidth="230.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="210.0" />
-      <TextField fx:id="outgoingHostField" layoutX="271.0" layoutY="278.0" prefHeight="33.0" prefWidth="230.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="260.0" />
-      <Label layoutX="156.0" layoutY="226.0" prefHeight="33.0" prefWidth="88.0" text="Incoming Host" AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="210.0" />
-      <Label layoutX="156.0" layoutY="284.0" prefHeight="33.0" prefWidth="88.0" text="Outgoing Host" AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="260.0" />
-      <CheckBox fx:id="oauthCheckBox" layoutX="110.0" layoutY="362.0" mnemonicParsing="false" prefHeight="53.0" prefWidth="272.0" text="OAuth2 Authorization (Gmail account only)" AnchorPane.topAnchor="330.0" />
-      <CheckBox fx:id="manualHostCheckBox" layoutX="100.0" layoutY="157.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="312.0" text="manual host configuration" AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="160.0" />
+      <Label layoutX="39.0" layoutY="173.0" prefHeight="33.0" prefWidth="57.0" text="Password" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="100.0" />
+      <PasswordField fx:id="passwordField" layoutX="156.0" layoutY="173.0" prefHeight="33.0" prefWidth="310.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="100.0" />
+      <TextField fx:id="incomingHostField" layoutX="268.0" layoutY="226.0" prefHeight="33.0" prefWidth="230.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="180.0" />
+      <TextField fx:id="outgoingHostField" layoutX="271.0" layoutY="278.0" prefHeight="33.0" prefWidth="230.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="230.0" />
+      <Label layoutX="156.0" layoutY="226.0" prefHeight="33.0" prefWidth="88.0" text="Incoming Host" AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="180.0" />
+      <Label layoutX="156.0" layoutY="284.0" prefHeight="33.0" prefWidth="88.0" text="Outgoing Host" AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="230.0" />
+      <CheckBox fx:id="oauthCheckBox" layoutX="110.0" layoutY="362.0" mnemonicParsing="false" prefHeight="53.0" prefWidth="272.0" text="OAuth2 Authorization (Gmail account only)" AnchorPane.topAnchor="310.0" />
       <Button layoutX="119.0" layoutY="413.0" mnemonicParsing="false" onAction="#applyButtonAction" prefHeight="31.0" prefWidth="94.0" text="Apply" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="130.0" />
       <Button layoutX="256.0" layoutY="413.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="31.0" prefWidth="94.0" text="Cancel" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="130.0" />
    </children>
