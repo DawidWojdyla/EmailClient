@@ -14,7 +14,7 @@
       <WebView fx:id="webView" layoutX="14.0" layoutY="126.0" prefHeight="462.0" prefWidth="595.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="126.0" />
       <Label fx:id="subjectLabel" layoutX="120.0" layoutY="23.0" prefHeight="25.0" prefWidth="475.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
       <Label fx:id="senderLabel" layoutX="120.0" layoutY="53.0" prefHeight="25.0" prefWidth="475.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="40.0" />
-      <ScrollPane fx:id="attachScrollPane" fitToHeight="true" layoutX="99.0" layoutY="80.0" prefHeight="40.0" prefWidth="540.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="80.0">
+      <ScrollPane fx:id="attachScrollPane" fitToHeight="true" fitToWidth="true" layoutX="99.0" layoutY="80.0" prefHeight="40.0" prefWidth="540.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="80.0">
          <content>
             <HBox fx:id="hBoxDownloads" alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="534.0" />
          </content>

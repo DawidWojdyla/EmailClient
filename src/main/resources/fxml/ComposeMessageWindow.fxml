@@ -23,7 +23,7 @@
       <Label layoutX="20.0" layoutY="14.0" prefHeight="18.0" prefWidth="57.0" text="Account" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="25.0" />
       <ChoiceBox fx:id="emailAccountChoiceBox" layoutX="80.0" layoutY="36.0" prefHeight="25.0" prefWidth="309.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="25.0" />
       <Button layoutX="10.0" layoutY="151.0" mnemonicParsing="false" onAction="#attachButtonAction" prefHeight="25.0" prefWidth="57.0" text="Attach:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="151.0" />
-      <ScrollPane fitToHeight="true" layoutX="80.0" layoutY="144.0" prefHeight="40.0" prefWidth="584.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="140.0">
+      <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="80.0" layoutY="144.0" prefHeight="40.0" prefWidth="584.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="140.0">
          <content>
             <HBox fx:id="attachHBox" prefHeight="30.0" prefWidth="582.0" snapToPixel="false">
                <padding>
