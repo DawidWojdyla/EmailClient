@@ -51,12 +51,12 @@ public class EmailManager {
     private final List<Folder> folderList = new ArrayList<>();
 
     public EmailManager() {
-        setMailProperties();
+        setProperties();
         FolderUpdaterService folderUpdaterService = new FolderUpdaterService(folderList);
         folderUpdaterService.start();
     }
 
-    private void setMailProperties() {
+    private void setProperties() {
         setDefaultMailProperties();
         setOauthDefaultMailProperties();
         setOauthProperties();

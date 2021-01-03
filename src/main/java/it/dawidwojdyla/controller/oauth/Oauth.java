@@ -47,7 +47,6 @@ public class Oauth {
 
     private void listenForAuthorizationCode(WebView webView, String emailAddress) {
         System.out.println("OAUTH: listenForAuthorizationCode()");
-        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
         Stage stage = (Stage) webView.getScene().getWindow();
         stage.setOnCloseRequest(e -> {
             System.out.println("OAUTH: listenForAuthorizationCode() -> setOnCloseRequest()");

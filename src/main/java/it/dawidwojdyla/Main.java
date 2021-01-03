@@ -29,6 +29,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
 
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
         ViewFactory viewFactory = new ViewFactory(emailManager);
 
         List<ValidAccount> validAccounts = persistenceAccess.loadFromPersistence();
