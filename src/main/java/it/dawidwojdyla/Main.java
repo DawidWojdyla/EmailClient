@@ -33,14 +33,18 @@ public class Main extends Application {
 
         List<ValidAccount> validAccounts = persistenceAccess.loadFromPersistence();
         if (validAccounts.isEmpty()) {
+            System.out.println("Main: validAccounts.isEmpty()==true");
             viewFactory.showLoginWindow();
         } else {
+            System.out.println("Main: validAccounts.isEmpty()==false");
             for (ValidAccount account : validAccounts) {
                 EmailAccount emailAccount = new EmailAccount(account.getAddress(), account.getPassword(), account.getProperties());
 
                 if (emailAccount.getProperties().containsValue("XOAUTH2")) {
+                    System.out.println("Main: emailAccount with oauth");
                     long tokenExpires = Long.parseLong(emailAccount.getProperties().getProperty("token_expires"));
                     if (System.currentTimeMillis() > tokenExpires) {
+                        System.out.println("Main: token expires");
                         Oauth oauth = new Oauth(emailManager.getOauthProperties(), emailAccount.getProperties());
                         Service<Void> service = new Service<>() {
                             @Override

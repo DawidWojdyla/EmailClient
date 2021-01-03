@@ -37,6 +37,10 @@ public class EmailAccount {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Properties getProperties() {
         return properties;
     }

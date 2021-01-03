@@ -2,6 +2,7 @@ package it.dawidwojdyla.controller;
 
 import it.dawidwojdyla.EmailManager;
 import it.dawidwojdyla.controller.oauth.Oauth;
+import it.dawidwojdyla.controller.oauth.OauthAuthorizingController;
 import it.dawidwojdyla.controller.services.LoginService;
 import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.view.ViewFactory;
@@ -17,7 +18,7 @@ import java.util.ResourceBundle;
 /**
  * Created by Dawid on 2020-11-26.
  */
-public class LoginWindowController extends AbstractController implements Initializable {
+public class LoginWindowController extends OauthAuthorizingController implements Initializable {
 
     @FXML
     private Button loginButton;
@@ -50,21 +51,13 @@ public class LoginWindowController extends AbstractController implements Initial
         super(emailManager, viewFactory, fxmlName);
     }
 
-    public void enableLoginAction() {
+    public void enableAction() {
         isLoginActionBlocked = false;
         errorLabel.setText("");
     }
 
     public String getEmailAddress() {
         return emailAddressField.getText();
-    }
-
-    public EmailManager getEmailManager() {
-        return emailManager;
-    }
-
-    public ViewFactory getViewFactory() {
-        return viewFactory;
     }
 
     @FXML
@@ -76,7 +69,7 @@ public class LoginWindowController extends AbstractController implements Initial
                 if (oauthCheckBox.isSelected()) {
                     isLoginActionBlocked = true;
                     Oauth oauth = new Oauth(this);
-                    oauth.obtainAuthorizationCode();
+                    oauth.startNewAutorization(emailAddressField.getText());
                 } else {
                     Properties properties = new Properties();
                     properties.putAll(emailManager.getDefaultMailProperties());
@@ -88,7 +81,7 @@ public class LoginWindowController extends AbstractController implements Initial
         }
     }
 
-    public void logUsingOAuth(Properties oauthTokens) {
+    public void loginUsingOAuth(Properties oauthTokens) {
         if(oauthTokens.getProperty("access_token").equals("")) {
             errorLabel.setText("Couldn't get accessToken");
         } else {
@@ -98,6 +91,11 @@ public class LoginWindowController extends AbstractController implements Initial
             logInToNewAccount(properties, true);
         }
         isLoginActionBlocked = false;
+    }
+
+    @Override
+    public void authorizationFailed() {
+        errorLabel.setText("OAuth authorization Failed");
     }
 
     private void logInToNewAccount(Properties properties, boolean isOauth) {
