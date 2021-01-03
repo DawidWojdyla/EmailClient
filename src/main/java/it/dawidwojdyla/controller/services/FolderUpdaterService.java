@@ -21,16 +21,16 @@ public class FolderUpdaterService extends Service<Void> {
         return new Task<>() {
             @Override
             protected Void call() throws Exception {
-                Thread.sleep(10000);
+                Folder folder;
                 for(;;) {
                     try {
                         Thread.sleep(5000);
-                        for(Folder folder: folderList) {
+                        for(int i = 0; i < folderList.size(); i++)  {
+                            folder = folderList.get(i);
                             if(folder.getType() != Folder.HOLDS_FOLDERS && folder.isOpen()) {
                                 folder.getMessageCount();
                             }
                         }
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
