@@ -58,11 +58,12 @@ public class ViewFactory {
     }
 
     public void showMainWindow() {
-
-        AbstractController controller = new MainWindowController(emailManager, this, "MainWindow.fxml");
-        initializeStage(controller, true);
-        mainViewInitialized = true;
-        activeStages.get(activeStages.size() - 1).setOnCloseRequest(e -> Platform.exit());
+        if(!mainViewInitialized) {
+            mainViewInitialized = true;
+            AbstractController controller = new MainWindowController(emailManager, this, "MainWindow.fxml");
+            initializeStage(controller, true);
+            activeStages.get(activeStages.size() - 1).setOnCloseRequest(e -> Platform.exit());
+        }
 
     }
 

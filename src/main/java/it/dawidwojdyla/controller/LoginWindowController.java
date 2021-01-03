@@ -108,9 +108,7 @@ public class LoginWindowController extends OauthAuthorizingController implements
             EmailLoginResult emailLoginResult = loginService.getValue();
             switch(emailLoginResult) {
                 case SUCCESS:
-                    if(!viewFactory.isMainViewInitialized()) {
-                        viewFactory.showMainWindow();
-                    }
+                    viewFactory.showMainWindow();
                     Stage stage = (Stage) errorLabel.getScene().getWindow();
                     viewFactory.closeStage(stage);
                     return;
