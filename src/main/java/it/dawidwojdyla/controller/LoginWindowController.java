@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-
 import java.net.URL;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -51,11 +50,6 @@ public class LoginWindowController extends OauthAuthorizingController implements
         super(emailManager, viewFactory, fxmlName);
     }
 
-    public void enableAction() {
-        isLoginActionBlocked = false;
-        errorLabel.setText("");
-    }
-
     public String getEmailAddress() {
         return emailAddressField.getText();
     }
@@ -94,8 +88,9 @@ public class LoginWindowController extends OauthAuthorizingController implements
     }
 
     @Override
-    public void authorizationFailed() {
-        errorLabel.setText("OAuth authorization Failed");
+    public void authorizationFailed(String errorMessage) {
+        errorLabel.setText(errorMessage);
+        isLoginActionBlocked = false;
     }
 
     private void logInToNewAccount(Properties properties, boolean isOauth) {

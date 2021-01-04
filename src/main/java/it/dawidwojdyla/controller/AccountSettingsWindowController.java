@@ -45,20 +45,16 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
 
     private EmailAccount emailAccount;
 
-    private boolean switchToOauthRollBackFlag = false;
+    private boolean switchingToOauthRollBackFlag = false;
+
+    private Oauth oauth;
 
     public AccountSettingsWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
         super(emailManager, viewFactory, fxmlName);
     }
 
     @Override
-    public void enableAction() {
-        isActionEnabled = true;
-    }
-
-    @Override
     public void loginUsingOAuth(Properties tokens) {
-        updateFields();
         emailAccount.getProperties().putAll(tokens);
         relogin(true);
     }
@@ -67,24 +63,35 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
     void applyButtonAction() {
         System.out.println("AccountSettingsWindowController: applyButtonAction()");
         if (isActionEnabled) {
+            errorLabel.setText("");
             System.out.println("AccountSettingsWindowController: isActionEnabled==true");
             emailAccount = emailAccountChoiceBox.getValue();
             if (oauthCheckBox.isSelected()) {
                 manageOauth();
             } else if (emailAccount.getProperties().containsValue("XOAUTH2")) {
                 switchToDefaultMailProperties();
-                updateFields();
                 relogin(false);
             } else if (!passwordField.getText().equals(emailAccount.getPassword()) ||
                     !incomingHostField.getText().equals(emailAccount.getProperties().getProperty("incomingHost")) ||
                     !outgoingHostField.getText().equals(emailAccount.getProperties().getProperty("outgoingHost"))) {
-                updateFields();
                 relogin(false);
             } else {
                 closeStage();
             }
         } else {
             errorLabel.setText("OAuth2 authorization flow in progress...");
+        }
+    }
+
+    @FXML
+    void cancelButtonAction() {
+        System.out.println("AccountSettingsWindowController: cancelButtonAction()");
+        if (isActionEnabled) {
+            closeStage();
+        } else if(oauth != null) {
+            oauth.closeAuthorizationStage();
+            authorizationFailed("Authorization has been canceled");
+            oauth = null;
         }
     }
 
@@ -100,11 +107,9 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
     private void continueWithOauth() {
         System.out.println("AccountSettingsWindowController: continueWithOauth()");
         if (!emailAccount.getPassword().equals(passwordField.getText())) {
-            //updateFields();
             startOauthAuthorization();
         } else if (!incomingHostField.getText().equals(emailAccount.getProperties().getProperty("incomingHost")) ||
                 !outgoingHostField.getText().equals(emailAccount.getProperties().getProperty("outgoingHost"))) {
-            updateAccountHosts();
             relogin(true);
         } else {
             closeStage();
@@ -118,11 +123,9 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
                 !emailAccount.getProperties().containsKey("refresh_token") ||
                 !emailAccount.getProperties().containsKey("token_expires") ||
                 !emailAccount.getPassword().equals(passwordField.getText())) {
-            //updateFields();
             startOauthAuthorization();
-            switchToOauthRollBackFlag = true;
+            switchingToOauthRollBackFlag = true;
         } else {
-            updateAccountHosts();
             long tokenExpires = Long.parseLong(emailAccount.getProperties().getProperty("token_expires"));
             if (System.currentTimeMillis() > tokenExpires) {
                 System.out.println("AccountSettingsWindowController: token expires...");
@@ -149,12 +152,13 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
     }
 
     @Override
-    public void authorizationFailed() {
-        errorLabel.setText("OAuth2 authorization failed");
+    public void authorizationFailed(String errorMessage) {
         System.out.println("AccountSettingsWindowController: authorizationFailed()");
-        if (switchToOauthRollBackFlag) {
+        errorLabel.setText(errorMessage);
+        isActionEnabled = true;
+        if (switchingToOauthRollBackFlag) {
             switchToDefaultMailProperties();
-            switchToOauthRollBackFlag = false;
+            switchingToOauthRollBackFlag = false;
         }
     }
 
@@ -173,7 +177,8 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
     private void updateFields() {
         System.out.println("AccountSettingsWindowController: updateFields()");
         emailAccount.setPassword(passwordField.getText());
-        updateAccountHosts();
+        emailAccount.getProperties().setProperty("incomingHost", incomingHostField.getText());
+        emailAccount.getProperties().setProperty("outgoingHost", outgoingHostField.getText());
     }
 
     private void startOauthAuthorization() {
@@ -181,6 +186,7 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
         isActionEnabled = false;
         Oauth oauth = new Oauth(this);
         oauth.startNewAutorization(emailAccount.getAddress());
+        this.oauth = oauth;
     }
 
     private void addDefaultMailProperties() {
@@ -209,13 +215,9 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
         }
     }
 
-    private void updateAccountHosts() {
-        System.out.println("AccountSettingsWindowController: updateAccountHosts()");
-        emailAccount.getProperties().setProperty("incomingHost", incomingHostField.getText());
-        emailAccount.getProperties().setProperty("outgoingHost", outgoingHostField.getText());
-    }
-
     private void relogin(boolean isOauth) {
+        //Maybe there should be some tempFields for rolling back when emailLoginResult not SUCCESS
+        updateFields();
         System.out.println("AccountSettingsWindowController: relogin(isOauth: " + isOauth + ")");
         LoginService loginService = new LoginService(emailAccount, emailManager, isOauth);
         System.out.println("AccountSettingsWindowController: newLoginService()");
@@ -240,16 +242,6 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
         loginService.start();
     }
 
-    @FXML
-    void cancelButtonAction() {
-        System.out.println("AccountSettingsWindowController: cancelButtonAction()");
-        if (isActionEnabled) {
-            closeStage();
-        } else {
-            errorLabel.setText("OAuth2 authorization flow in progress...");
-        }
-    }
-
     private void closeStage() {
         System.out.println("AccountSettingsWindowController: closeStage()");
         viewFactory.closeStage((Stage) oauthCheckBox.getScene().getWindow());
@@ -257,13 +249,16 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        emailAccountChoiceBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldChoice, newChoice) -> {
-            passwordField.setText(newChoice.getPassword());
-            incomingHostField.setText(newChoice.getProperties().getProperty("incomingHost"));
-            outgoingHostField.setText(newChoice.getProperties().getProperty("outgoingHost"));
-            oauthCheckBox.setSelected(newChoice.getProperties().containsValue("XOAUTH2"));
-        });
+        emailAccountChoiceBox.getSelectionModel().selectedItemProperty().
+                addListener((observableValue, oldChoice, newChoice) -> setTextFields(newChoice));
         emailAccountChoiceBox.setItems(emailManager.getEmailAccounts());
         emailAccountChoiceBox.setValue(emailManager.getEmailAccounts().get(0));
+    }
+
+    private void setTextFields(EmailAccount newChoice) {
+        passwordField.setText(newChoice.getPassword());
+        incomingHostField.setText(newChoice.getProperties().getProperty("incomingHost"));
+        outgoingHostField.setText(newChoice.getProperties().getProperty("outgoingHost"));
+        oauthCheckBox.setSelected(newChoice.getProperties().containsValue("XOAUTH2"));
     }
 }

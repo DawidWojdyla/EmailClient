@@ -24,6 +24,7 @@ public class Oauth {
     private EmailManager emailManager;
     private ViewFactory viewFactory;
     private OauthAuthorizingController controller;
+    private Stage authorizationWindowStage;
 
     public Oauth(OauthAuthorizingController controller) {
         this.controller = controller;
@@ -37,6 +38,13 @@ public class Oauth {
        this.oauthProperties = oauthProperties;
     }
 
+    public void closeAuthorizationStage() {
+        if (authorizationWindowStage != null) {
+            viewFactory.closeStage(authorizationWindowStage);
+            authorizationWindowStage = null;
+        }
+    }
+
     public void startNewAutorization(String emailAddress) {
         System.out.println("OAUTH: startNewAutorization()");
             ObtainAuthorizationCodeWindowController authorizationCodeWindowController =
@@ -47,11 +55,10 @@ public class Oauth {
 
     private void listenForAuthorizationCode(WebView webView, String emailAddress) {
         System.out.println("OAUTH: listenForAuthorizationCode()");
-        Stage stage = (Stage) webView.getScene().getWindow();
-        stage.setOnCloseRequest(e -> {
+        authorizationWindowStage = (Stage) webView.getScene().getWindow();
+        authorizationWindowStage.setOnCloseRequest(e -> {
             System.out.println("OAUTH: listenForAuthorizationCode() -> setOnCloseRequest()");
             manageWithAuthorizationCode();
-            controller.enableAction();
         });
 
         webView.getEngine().locationProperty().addListener((observableValue, oldAddress, newAddress) -> {
@@ -60,7 +67,7 @@ public class Oauth {
                     authorizationCode = extractAuthorizationCodeFromURL(newAddress);
                 }
                 manageWithAuthorizationCode();
-                viewFactory.closeStage(stage);
+                closeAuthorizationStage();
             }
         });
         webView.getEngine().load(buildAuthorizationURL(emailAddress));
@@ -94,10 +101,11 @@ public class Oauth {
                 exchangeAuthorizationCodeForTokens();
             } catch (IOException e) {
                 e.printStackTrace();
+                controller.authorizationFailed("OAuth2 Authorization failed");
             }
         } else {
             System.out.println("OAUTH: controller.authorizationFailed()");
-            controller.authorizationFailed();
+            controller.authorizationFailed("Authorization window has been closed");
         }
     }
 
@@ -107,8 +115,8 @@ public class Oauth {
         HttpURLConnection connection = buildConnection(request);
 
         HashMap<String, Object> result;
-        result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {
-        });
+        result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {});
+
         Properties oauthTokens = new Properties();
         oauthTokens.put("access_token", result.get("access_token"));
         oauthTokens.put("refresh_token", result.get("refresh_token"));
