@@ -1,8 +1,9 @@
 package it.dawidwojdyla;
 
+import it.dawidwojdyla.controller.EmailLoginResult;
 import it.dawidwojdyla.controller.oauth.Oauth;
 import it.dawidwojdyla.controller.persistence.PersistenceAccess;
-import it.dawidwojdyla.controller.persistence.ValidAccount;
+import it.dawidwojdyla.controller.persistence.VerifiedAccount;
 import it.dawidwojdyla.controller.services.LoginService;
 import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.view.ViewFactory;
@@ -32,13 +33,13 @@ public class Main extends Application {
         System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
         ViewFactory viewFactory = new ViewFactory(emailManager);
 
-        List<ValidAccount> validAccounts = persistenceAccess.loadFromPersistence();
-        if (validAccounts.isEmpty()) {
+        List<VerifiedAccount> verifiedAccounts = persistenceAccess.loadFromPersistence();
+        if (verifiedAccounts.isEmpty()) {
             System.out.println("Main: validAccounts.isEmpty()==true");
             viewFactory.showLoginWindow();
         } else {
             System.out.println("Main: validAccounts.isEmpty()==false");
-            for (ValidAccount account : validAccounts) {
+            for (VerifiedAccount account : verifiedAccounts) {
                 EmailAccount emailAccount = new EmailAccount(account.getAddress(), account.getPassword(), account.getProperties());
 
                 if (emailAccount.getProperties().containsValue("XOAUTH2")) {
@@ -74,15 +75,23 @@ public class Main extends Application {
 
         @Override
         public void stop () {
-            List<ValidAccount> validAccounts = new ArrayList<>();
+            List<VerifiedAccount> verifiedAccounts = new ArrayList<>();
             for (EmailAccount emailAccount : emailManager.getEmailAccounts()) {
-                validAccounts.add(new ValidAccount(emailAccount.getAddress(), emailAccount.getPassword(), emailAccount.getProperties()));
+                verifiedAccounts.add(new VerifiedAccount(emailAccount.getAddress(), emailAccount.getPassword(), emailAccount.getProperties()));
             }
-            persistenceAccess.saveToPersistence(validAccounts);
+            for (EmailAccount emailAccount : emailManager.getInvalidEmailAccounts()) {
+                verifiedAccounts.add(new VerifiedAccount(emailAccount.getAddress(), emailAccount.getPassword(), emailAccount.getProperties()));
+            }
+            persistenceAccess.saveToPersistence(verifiedAccounts);
         }
 
     private void logIntoAccount(EmailAccount emailAccount, boolean isOauth) {
         LoginService loginService = new LoginService(emailAccount, emailManager, isOauth);
         loginService.start();
+        loginService.setOnSucceeded(e -> {
+            if (loginService.getValue() != EmailLoginResult.SUCCESS) {
+                emailManager.addInvalidEmailAccount(emailAccount);
+            }
+            });
     }
 }

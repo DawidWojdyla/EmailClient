@@ -23,11 +23,28 @@ public class EmailManager {
     private EmailMessage selectedMessage;
     private EmailTreeItem<String> selectedFolder;
     private final ObservableList<EmailAccount> emailAccounts = FXCollections.observableArrayList();
+    private final ObservableList<EmailAccount> invalidEmailAccounts = FXCollections.observableArrayList();
     private final IconResolver iconResolver = new IconResolver();
-    private HashMap<String, Properties> mailProperties = new HashMap<>();
+    private final HashMap<String, Properties> mailProperties = new HashMap<>();
+    private final EmailTreeItem<String> foldersRoot = new EmailTreeItem<>("");
+    private final List<Folder> folderList = new ArrayList<>();
+
+    public EmailManager() {
+        setProperties();
+        FolderUpdaterService folderUpdaterService = new FolderUpdaterService(folderList);
+        folderUpdaterService.start();
+    }
+
+    public EmailTreeItem<String> getFoldersRoot() {
+        return foldersRoot;
+    }
 
     public ObservableList<EmailAccount> getEmailAccounts() {
         return emailAccounts;
+    }
+
+    public ObservableList<EmailAccount> getInvalidEmailAccounts() {
+        return invalidEmailAccounts;
     }
 
     public EmailMessage getSelectedMessage() {
@@ -40,20 +57,6 @@ public class EmailManager {
 
     public void setSelectedFolder(EmailTreeItem<String> selectedFolder) {
         this.selectedFolder = selectedFolder;
-    }
-
-    private final EmailTreeItem<String> foldersRoot = new EmailTreeItem<>("");
-
-    public EmailTreeItem<String> getFoldersRoot() {
-        return foldersRoot;
-    }
-
-    private final List<Folder> folderList = new ArrayList<>();
-
-    public EmailManager() {
-        setProperties();
-        FolderUpdaterService folderUpdaterService = new FolderUpdaterService(folderList);
-        folderUpdaterService.start();
     }
 
     private void setProperties() {
@@ -111,6 +114,18 @@ public class EmailManager {
         FetchFoldersService fetchFoldersService = new FetchFoldersService(emailAccount.getStore(), treeItem, folderList);
         fetchFoldersService.start();
         foldersRoot.getChildren().add(treeItem);
+    }
+
+    public void addInvalidEmailAccount(EmailAccount emailAccount) {
+        invalidEmailAccounts.add(emailAccount);
+        EmailTreeItem<String> treeItem = new EmailTreeItem<>(emailAccount.getAddress() + " !");
+        treeItem.setGraphic(iconResolver.getIconForFolder("invalidAccount"));
+        foldersRoot.getChildren().add(treeItem);
+    }
+
+    public void removeInvalidEmailAccount(EmailAccount emailAccount) {
+        invalidEmailAccounts.remove(emailAccount);
+        foldersRoot.getChildren().removeIf(item -> item.getValue().equals(emailAccount.getAddress() + " !"));
     }
 
     public void setRead() {

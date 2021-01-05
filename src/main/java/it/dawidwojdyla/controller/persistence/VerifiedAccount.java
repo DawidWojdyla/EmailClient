@@ -6,13 +6,13 @@ import java.util.Properties;
 /**
  * Created by Dawid on 2020-12-10.
  */
-public class ValidAccount implements Serializable {
+public class VerifiedAccount implements Serializable {
 
     private String address;
     private String password;
     private Properties properties;
 
-    public ValidAccount(String address, String password, Properties properties) {
+    public VerifiedAccount(String address, String password, Properties properties) {
         this.address = address;
         this.password = password;
         this.properties = properties;

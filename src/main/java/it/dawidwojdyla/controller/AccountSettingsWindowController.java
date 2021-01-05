@@ -6,6 +6,8 @@ import it.dawidwojdyla.controller.oauth.OauthAuthorizingController;
 import it.dawidwojdyla.controller.services.LoginService;
 import it.dawidwojdyla.model.EmailAccount;
 import it.dawidwojdyla.view.ViewFactory;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -216,7 +218,6 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
     }
 
     private void relogin(boolean isOauth) {
-        //Maybe there should be some tempFields for rolling back when emailLoginResult not SUCCESS
         updateFields();
         System.out.println("AccountSettingsWindowController: relogin(isOauth: " + isOauth + ")");
         LoginService loginService = new LoginService(emailAccount, emailManager, isOauth);
@@ -226,6 +227,7 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
             switch(emailLoginResult) {
                 case SUCCESS:
                     System.out.println("AccountSettingsWindowController: Login -> success");
+                    emailManager.removeInvalidEmailAccount(emailAccount);
                     closeStage();
                     return;
                 case FAILED_BY_CREDENTIALS:
@@ -251,7 +253,10 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
     public void initialize(URL location, ResourceBundle resources) {
         emailAccountChoiceBox.getSelectionModel().selectedItemProperty().
                 addListener((observableValue, oldChoice, newChoice) -> setTextFields(newChoice));
-        emailAccountChoiceBox.setItems(emailManager.getEmailAccounts());
+        ObservableList<EmailAccount> accounts = FXCollections.observableArrayList();
+        accounts.addAll(emailManager.getEmailAccounts());
+        accounts.addAll(emailManager.getInvalidEmailAccounts());
+        emailAccountChoiceBox.setItems(accounts);
         emailAccountChoiceBox.setValue(emailManager.getEmailAccounts().get(0));
     }
 

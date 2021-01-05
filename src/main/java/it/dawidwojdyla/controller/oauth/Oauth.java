@@ -18,7 +18,7 @@ import java.util.Properties;
  */
 public class Oauth {
 
-    private Properties oauthProperties;
+    private final Properties oauthProperties;
     private Properties accountProperties;
     private String authorizationCode;
     private EmailManager emailManager;

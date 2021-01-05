@@ -25,6 +25,8 @@ public class IconResolver {
                 imageView = new ImageView(new Image(Main.class.getClassLoader().getResourceAsStream("icons/spam.png")));
             } else if (lowerCaseFolderName.contains("trash") || lowerCaseFolderName.contains("kosz")) {
             imageView = new ImageView(new Image(Main.class.getClassLoader().getResourceAsStream("icons/bin.png")));
+            } else if (lowerCaseFolderName.equals("invalidaccount")) {
+                imageView = new ImageView(new Image(Main.class.getClassLoader().getResourceAsStream("icons/email2.png")));
         }else {
                 imageView = new ImageView(new Image(Main.class.getClassLoader().getResourceAsStream("icons/folder.png")));
             }
