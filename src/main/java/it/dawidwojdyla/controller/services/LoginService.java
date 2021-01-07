@@ -24,19 +24,16 @@ public class LoginService extends Service<EmailLoginResult> {
     }
 
     private EmailLoginResult login() {
-        System.out.println("LoginService: login()");
         Session session;
         Store store;
         try {
             if (isOauth) {
-                System.out.println("LoginService: isOauth==true");
                 session = Session.getInstance(emailAccount.getProperties());
                 store = session.getStore("imap");
                 store.connect(emailAccount.getProperties().getProperty("incomingHost"),
                         emailAccount.getAddress(),
                         emailAccount.getProperties().getProperty("access_token"));
             } else {
-                System.out.println("LoginService: isOauth==false");
                 Authenticator authenticator = new Authenticator() {
                     @Override
                     protected PasswordAuthentication getPasswordAuthentication() {
@@ -53,7 +50,6 @@ public class LoginService extends Service<EmailLoginResult> {
             emailAccount.setSession(session);
             if (!emailManager.getEmailAccounts().contains(emailAccount)) {
                 emailManager.addEmailAccount(emailAccount);
-                System.out.println("LoginService: !emailManager.getEmailAccounts().contains(emailAccount) == true");
             }
         } catch (NoSuchProviderException e) {
             e.printStackTrace();

@@ -46,7 +46,6 @@ public class Oauth {
     }
 
     public void startNewAutorization(String emailAddress) {
-        System.out.println("OAUTH: startNewAutorization()");
             ObtainAuthorizationCodeWindowController authorizationCodeWindowController =
                     new ObtainAuthorizationCodeWindowController(emailManager, viewFactory, "ObtainAuthorizationCodeWindow.fxml");
             viewFactory.showObtainAuthorizationCodeWindow(authorizationCodeWindowController);
@@ -54,12 +53,8 @@ public class Oauth {
     }
 
     private void listenForAuthorizationCode(WebView webView, String emailAddress) {
-        System.out.println("OAUTH: listenForAuthorizationCode()");
         authorizationWindowStage = (Stage) webView.getScene().getWindow();
-        authorizationWindowStage.setOnCloseRequest(e -> {
-            System.out.println("OAUTH: listenForAuthorizationCode() -> setOnCloseRequest()");
-            manageWithAuthorizationCode();
-        });
+        authorizationWindowStage.setOnCloseRequest(e -> manageWithAuthorizationCode());
 
         webView.getEngine().locationProperty().addListener((observableValue, oldAddress, newAddress) -> {
             if(newAddress.startsWith(oauthProperties.getProperty("redirect_uri"))) {
@@ -78,14 +73,12 @@ public class Oauth {
         return oauthProperties.getProperty("authorization_server") +
                 "?scope=" + oauthProperties.getProperty("scope") +
                 "&response_type=code" +
-                //"&state=" + securityToken +
                 "&login_hint=" + emailAddress +
                 "&redirect_uri=" + oauthProperties.getProperty("redirect_uri") +
                 "&client_id=" + oauthProperties.getProperty("client_id");
     }
 
     private String extractAuthorizationCodeFromURL(String url) {
-        System.out.println("OAUTH: extractAuthorizationCodeFromURL()");
         String authorizationCode;
         authorizationCode = url.substring(url.indexOf("code=") + 5);
         if (authorizationCode.contains("&")) {
@@ -95,7 +88,6 @@ public class Oauth {
     }
 
     private void manageWithAuthorizationCode() {
-        System.out.println("OAUTH: manageWithAuthorizationCode()");
         if(authorizationCode != null && !authorizationCode.equals("")) {
             try {
                 exchangeAuthorizationCodeForTokens();
@@ -104,13 +96,11 @@ public class Oauth {
                 controller.authorizationFailedAction("OAuth2 Authorization failed");
             }
         } else {
-            System.out.println("OAUTH: controller.authorizationFailed()");
             controller.authorizationFailedAction("Authorization window has been closed");
         }
     }
 
     private void exchangeAuthorizationCodeForTokens() throws IOException {
-        System.out.println("OAUTH: exchangeAuthorizationCodeForTokens()");
         String request = buildExchangeRequest();
         HttpURLConnection connection = buildConnection(request);
 
@@ -122,12 +112,11 @@ public class Oauth {
         oauthTokens.put("refresh_token", result.get("refresh_token"));
         long tokenExpires = (System.currentTimeMillis() + ((Number)result.get("expires_in")).intValue() * 1000 - 5000);
         oauthTokens.put("token_expires", tokenExpires + "");
-        System.out.println("OAUTH: controller.loginUsingOAuth(oauthTokens)");
+
         controller.loginUsingOAuth(oauthTokens);
     }
 
     private String buildExchangeRequest() {
-        System.out.println("OAUTH: buildExchangeRequest");
         return "code=" + authorizationCode +
                 "&client_id=" + oauthProperties.getProperty("client_id") +
                 "&client_secret=" + oauthProperties.getProperty("client_secret") +
@@ -136,7 +125,6 @@ public class Oauth {
     }
 
     private HttpURLConnection buildConnection(String request) throws IOException {
-        System.out.println("OAUTH: buildConnection");
         HttpURLConnection connection = (HttpURLConnection) new URL(oauthProperties.getProperty("token_server")).openConnection();
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
@@ -150,21 +138,17 @@ public class Oauth {
     }
 
     public void refreshAccessToken() throws IOException {
-        System.out.println("OAUTH: refreshAccessToken");
         String request = buildRefreshTokenRequest();
         HttpURLConnection connection = buildConnection(request);
 
         HashMap<String, Object> result;
-        result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {
-        });
+        result = new ObjectMapper().readValue(connection.getInputStream(), new TypeReference<>() {});
         accountProperties.put("access_token", result.get("access_token"));
         long tokenExpires = (System.currentTimeMillis() + ((Number) result.get("expires_in")).intValue() * 1000 - 5000);
         accountProperties.put("token_expires", tokenExpires + "");
-        System.out.println("OAUTH: set reshreshed token to account properties");
     }
 
     private String buildRefreshTokenRequest() {
-        System.out.println("OAUTH: buildRefreshTokenRequest");
         return "client_id=" + oauthProperties.getProperty("client_id") +
                 "&client_secret=" + oauthProperties.getProperty("client_secret") +
                 "&refresh_token="+ accountProperties.getProperty("refresh_token")+

@@ -64,15 +64,22 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
         super(emailManager, viewFactory, fxmlName);
     }
 
-    @Override
-    public void loginUsingOAuth(Properties tokens) {
-        emailAccount.getProperties().putAll(tokens);
-        relogin(true);
-    }
-
     @FXML
     void applyButtonAction() {
-        System.out.println("AccountSettingsWindowController: applyButtonAction()");
+        if (isActionEnabled) {
+            isActionEnabled = false;
+            errorLabel.setText("");
+            if(loginFailedFlag) {
+                loginFailedApplyButtonAction();
+            } else {
+                defaultApplyButtonAction();
+            }
+        } else {
+            errorLabel.setText("Wait for end of current action...");
+        }
+    }
+
+    private void setOnCloseRequest() {
         if (stage == null) {
             stage = (Stage) passwordField.getScene().getWindow();
             stage.setOnCloseRequest(e -> {
@@ -81,18 +88,6 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
                 }
                 rollBackAccountSettings();
             });
-        }
-        if (isActionEnabled) {
-            isActionEnabled = false;
-            errorLabel.setText("");
-            System.out.println("AccountSettingsWindowController: isActionEnabled==true");
-            if(loginFailedFlag) {
-                loginFailedApplyButtonAction();
-            } else {
-                defaultApplyButtonAction();
-            }
-        } else {
-            errorLabel.setText("Wait for end of current action...");
         }
     }
 
@@ -111,6 +106,7 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
     }
 
     private void defaultApplyButtonAction() {
+        setOnCloseRequest();
         if (oauthCheckBox.isSelected()) {
             manageOauth();
         } else if (wasOauth) {
@@ -131,7 +127,6 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
 
     @FXML
     void cancelButtonAction() {
-        System.out.println("AccountSettingsWindowController: cancelButtonAction()");
         if (isActionEnabled) {
             if (loginFailedFlag || authorizationFailedFlag || alertCancelFlag) {
                 rollBackAccountSettings();
@@ -144,12 +139,81 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
     }
 
     @Override
+    public void loginUsingOAuth(Properties tokens) {
+        emailAccount.getProperties().putAll(tokens);
+        relogin(true);
+    }
+
+    @Override
     public void authorizationFailedAction(String errorMessage) {
-        System.out.println("AccountSettingsWindowController: authorizationFailed()");
         errorLabel.setText(errorMessage);
         oauth = null;
         authorizationFailedFlag = true;
         isActionEnabled = true;
+    }
+
+    private void manageOauth() {
+        if (wasOauth) {
+            continueWithOauth();
+        } else {
+            switchToOauth();
+        }
+    }
+
+    private void continueWithOauth() {
+        if (!lastPassword.equals(passwordField.getText())) {
+            startOauthAuthorization();
+        } else if (!incomingHostField.getText().equals(lastIncomingHost) ||
+                !outgoingHostField.getText().equals(lastOutgoingHost)) {
+            relogin(true);
+        } else {
+            closeStage();
+        }
+    }
+
+    private void switchToOauth() {
+        if (!switchingToOauthFlag) {
+            switchingToOauthFlag = true;
+            switchingToDefaultFlag = false;
+            switchToOauthMailProperties();
+        }
+        if (!emailAccount.getProperties().containsKey("access_token") ||
+                !emailAccount.getProperties().containsKey("refresh_token") ||
+                !emailAccount.getProperties().containsKey("token_expires") ||
+                !lastPassword.equals(passwordField.getText())) {
+            startOauthAuthorization();
+        } else {
+            switchToOauthUsingPresentTokens();
+        }
+    }
+
+    private void switchToOauthUsingPresentTokens() {
+        long tokenExpires = Long.parseLong(emailAccount.getProperties().getProperty("token_expires"));
+        if (System.currentTimeMillis() > tokenExpires) {
+            Oauth oauth = new Oauth(emailManager.getOauthProperties(), emailAccount.getProperties());
+            Service<Void> service = new Service<>() {
+                @Override
+                protected Task<Void> createTask() {
+                    return new Task<>() {
+                        @Override
+                        protected Void call() throws IOException {
+                            oauth.refreshAccessToken();
+                            return null;
+                        }
+                    };
+                }
+            };
+            service.setOnSucceeded(e -> relogin(true));
+            service.start();
+        } else {
+            relogin(true);
+        }
+    }
+
+    private void updateEmailAccountFromFields() {
+        emailAccount.setPassword(passwordField.getText());
+        emailAccount.getProperties().setProperty("incomingHost", incomingHostField.getText());
+        emailAccount.getProperties().setProperty("outgoingHost", outgoingHostField.getText());
     }
 
     private void rollBackAccountSettings() {
@@ -167,103 +231,31 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
         }
     }
 
-    private void manageOauth() {
-        System.out.println("AccountSettingsWindowController: manageOauth()");
-        if (wasOauth) {
-            continueWithOauth();
-        } else {
-            switchToOauth();
-        }
-    }
-
-    private void continueWithOauth() {
-        System.out.println("AccountSettingsWindowController: continueWithOauth()");
-        if (!lastPassword.equals(passwordField.getText())) {
-            startOauthAuthorization();
-        } else if (!incomingHostField.getText().equals(lastIncomingHost) ||
-                !outgoingHostField.getText().equals(lastOutgoingHost)) {
-            relogin(true);
-        } else {
-            closeStage();
-        }
-    }
-
-    private void switchToOauth() {
-        System.out.println("AccountSettingsWindowController: switchToOauth()");
-        if (!switchingToOauthFlag) {
-            switchingToOauthFlag = true;
-            switchingToDefaultFlag = false;
-            switchToOauthMailProperties();
-        }
-        if (!emailAccount.getProperties().containsKey("access_token") ||
-                !emailAccount.getProperties().containsKey("refresh_token") ||
-                !emailAccount.getProperties().containsKey("token_expires") ||
-                !lastPassword.equals(passwordField.getText())) {
-            startOauthAuthorization();
-        } else {
-            long tokenExpires = Long.parseLong(emailAccount.getProperties().getProperty("token_expires"));
-            if (System.currentTimeMillis() > tokenExpires) {
-                System.out.println("AccountSettingsWindowController: token expires...");
-                Oauth oauth = new Oauth(emailManager.getOauthProperties(), emailAccount.getProperties());
-                Service<Void> service = new Service<>() {
-                    @Override
-                    protected Task<Void> createTask() {
-                        return new Task<>() {
-                            @Override
-                            protected Void call() throws IOException {
-                                System.out.println("AccountSettingsWindowController: call -> oauth.refreshAccessToken()");
-                                oauth.refreshAccessToken();
-                                return null;
-                            }
-                        };
-                    }
-                };
-                service.setOnSucceeded(e -> relogin(true));
-                service.start();
-            } else {
-                relogin(true);
-            }
-        }
-    }
-
     private void switchToOauthMailProperties() {
-        System.out.println("AccountSettingsWindowController: switchToOauthMailProperties()");
         removeDefaultMailProperties();
         addOauthMailProperties();
     }
 
     private void switchToDefaultMailProperties() {
-        System.out.println("AccountSettingsWindowController: switchToDefaultMailProperties()");
         removeOauthMailProperties();
         addDefaultMailProperties();
     }
 
-    private void updateEmailAccountFromFields() {
-        System.out.println("AccountSettingsWindowController: updateFields()");
-        emailAccount.setPassword(passwordField.getText());
-        emailAccount.getProperties().setProperty("incomingHost", incomingHostField.getText());
-        emailAccount.getProperties().setProperty("outgoingHost", outgoingHostField.getText());
-    }
-
     private void startOauthAuthorization() {
-        System.out.println("AccountSettingsWindowController: startOauthAuthorization()");
         Oauth oauth = new Oauth(this);
         oauth.startNewAutorization(emailAccount.getAddress());
         this.oauth = oauth;
     }
 
     private void addDefaultMailProperties() {
-        System.out.println("AccountSettingsWindowController: addDefaultMailProperties()");
         emailAccount.getProperties().putAll(emailManager.getDefaultMailProperties());
     }
 
     private void addOauthMailProperties() {
-        System.out.println("AccountSettingsWindowController: addOauthMailProperties()");
         emailAccount.getProperties().putAll(emailManager.getOauthDefaultMailProperties());
     }
 
     private void removeDefaultMailProperties() {
-        System.out.println("AccountSettingsWindowController: removeDefaultMailProperties()");
         Properties defaultMailProperties = emailManager.getDefaultMailProperties();
         for(String key: defaultMailProperties.stringPropertyNames()) {
             emailAccount.getProperties().remove(key);
@@ -271,7 +263,6 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
     }
 
     private void removeOauthMailProperties() {
-        System.out.println("AccountSettingsWindowController: removeOauthMailProperties()");
         Properties oauthMailProperties = emailManager.getOauthDefaultMailProperties();
         for(String key: oauthMailProperties.stringPropertyNames()) {
             emailAccount.getProperties().remove(key);
@@ -280,20 +271,16 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
 
     private void relogin(boolean isOauth) {
         updateEmailAccountFromFields();
-        System.out.println("AccountSettingsWindowController: relogin(isOauth: " + isOauth + ")");
         LoginService loginService = new LoginService(emailAccount, emailManager, isOauth);
-        System.out.println("AccountSettingsWindowController: newLoginService()");
         loginService.setOnSucceeded(event -> {
             oauth = null;
             EmailLoginResult emailLoginResult = loginService.getValue();
             if (emailLoginResult == EmailLoginResult.SUCCESS) {
-                System.out.println("AccountSettingsWindowController: Login -> success");
                 emailManager.removeInvalidEmailAccount(emailAccount);
                 closeStage();
             } else {
                 loginFailedFlag = true;
                 isActionEnabled = true;
-                System.out.println("AccountSettingsWindowController: Login -> error");
                 errorLabel.setText("Login Failed!");
             }
         });
@@ -301,7 +288,6 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
     }
 
     private void closeStage() {
-        System.out.println("AccountSettingsWindowController: closeStage()");
         viewFactory.closeStage((Stage) oauthCheckBox.getScene().getWindow());
     }
 
@@ -322,7 +308,7 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
         emailAccountChoiceBox.setValue(emailManager.getEmailAccounts().get(0));
     }
 
-    private void setCurrentAccount(EmailAccount newChoice) {
+    private void setCurrentAccount(EmailAccount currentAccount) {
         if (isActionEnabled) {
             if(authorizationFailedFlag || loginFailedFlag || alertCancelFlag) {
                 loginFailedFlag = false;
@@ -331,16 +317,17 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
                 rollBackAccountSettings();
             }
             errorLabel.setText("");
-            emailAccount = newChoice;
-            lastPassword = newChoice.getPassword();
-            lastIncomingHost = newChoice.getProperties().getProperty("incomingHost");
-            lastOutgoingHost = newChoice.getProperties().getProperty("outgoingHost");
-            wasOauth = newChoice.getProperties().containsValue("XOAUTH2");
+            emailAccount = currentAccount;
+            lastPassword = currentAccount.getPassword();
+            lastIncomingHost = currentAccount.getProperties().getProperty("incomingHost");
+            lastOutgoingHost = currentAccount.getProperties().getProperty("outgoingHost");
+            wasOauth = currentAccount.getProperties().containsValue("XOAUTH2");
 
             passwordField.setText(lastPassword);
             incomingHostField.setText(lastIncomingHost);
             outgoingHostField.setText(lastOutgoingHost);
             oauthCheckBox.setSelected(wasOauth);
+
         } else {
             emailAccountChoiceBox.setValue(emailAccount);
         }
