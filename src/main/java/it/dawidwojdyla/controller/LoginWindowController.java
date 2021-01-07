@@ -88,7 +88,7 @@ public class LoginWindowController extends OauthAuthorizingController implements
     }
 
     @Override
-    public void authorizationFailed(String errorMessage) {
+    public void authorizationFailedAction(String errorMessage) {
         errorLabel.setText(errorMessage);
         isLoginActionBlocked = false;
     }

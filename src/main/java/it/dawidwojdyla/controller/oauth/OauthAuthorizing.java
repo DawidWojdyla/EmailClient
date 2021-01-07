@@ -4,5 +4,5 @@ import java.util.Properties;
 
 public interface OauthAuthorizing {
     void loginUsingOAuth(Properties tokens);
-    void authorizationFailed(String errorMessage);
+    void authorizationFailedAction(String errorMessage);
 }

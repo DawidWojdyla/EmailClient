@@ -101,11 +101,11 @@ public class Oauth {
                 exchangeAuthorizationCodeForTokens();
             } catch (IOException e) {
                 e.printStackTrace();
-                controller.authorizationFailed("OAuth2 Authorization failed");
+                controller.authorizationFailedAction("OAuth2 Authorization failed");
             }
         } else {
             System.out.println("OAUTH: controller.authorizationFailed()");
-            controller.authorizationFailed("Authorization window has been closed");
+            controller.authorizationFailedAction("Authorization window has been closed");
         }
     }
 

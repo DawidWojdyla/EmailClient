@@ -42,7 +42,7 @@ public class Main extends Application {
             for (VerifiedAccount account : verifiedAccounts) {
                 EmailAccount emailAccount = new EmailAccount(account.getAddress(), account.getPassword(), account.getProperties());
 
-                if (emailAccount.getProperties().containsValue("XOAUTH2")) {
+                if (emailAccount.getProperties().containsValue("XOAUTH2") && emailAccount.getProperties().containsKey("token_expires")) {
                     System.out.println("Main: emailAccount with oauth");
                     long tokenExpires = Long.parseLong(emailAccount.getProperties().getProperty("token_expires"));
                     if (System.currentTimeMillis() > tokenExpires) {
