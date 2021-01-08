@@ -88,6 +88,11 @@ public class ViewFactory {
         initializeStage(controller,false);
     }
 
+    public void showDeleteAccountWindow() {
+        AbstractController controller = new DeleteAccountWindowController(emailManager, this, "DeleteAccountWindow.fxml");
+        initializeStage(controller,false);
+    }
+
 
     public void showEmailDetailsWindow(MessageRendererService messageRendererService) {
         AbstractController controller = new EmailDetailsWindowController(emailManager, this, "EmailDetailsWindow.fxml", messageRendererService);

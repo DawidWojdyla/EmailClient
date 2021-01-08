@@ -47,6 +47,15 @@ public class EmailManager {
         return invalidEmailAccounts;
     }
 
+    public ObservableList<EmailAccount> getAllEmailAccounts() {
+
+        ObservableList<EmailAccount> accounts = FXCollections.observableArrayList();
+        accounts.addAll(emailAccounts);
+        accounts.addAll(invalidEmailAccounts);
+
+        return accounts;
+    }
+
     public EmailMessage getSelectedMessage() {
         return selectedMessage;
     }
@@ -113,6 +122,7 @@ public class EmailManager {
         treeItem.setGraphic(iconResolver.getIconForFolder(emailAccount.getAddress()));
         FetchFoldersService fetchFoldersService = new FetchFoldersService(emailAccount.getStore(), treeItem, folderList);
         fetchFoldersService.start();
+        emailAccount.setFetchFolderService(fetchFoldersService);
         foldersRoot.getChildren().add(treeItem);
     }
 
@@ -126,6 +136,16 @@ public class EmailManager {
     public void removeInvalidEmailAccount(EmailAccount emailAccount) {
         invalidEmailAccounts.remove(emailAccount);
         foldersRoot.getChildren().removeIf(item -> item.getValue().equals(emailAccount.getAddress() + " !"));
+    }
+
+    public void removeEmailAccount(EmailAccount emailAccount) {
+        if (emailAccounts.contains(emailAccount)) {
+            emailAccount.getFetchFolderService().cancel();
+            foldersRoot.getChildren().removeIf(item -> item.getValue().equals(emailAccount.getAddress()));
+            emailAccounts.remove(emailAccount);
+        } else {
+            removeInvalidEmailAccount(emailAccount);
+        }
     }
 
     public void setRead() {

@@ -301,10 +301,7 @@ public class AccountSettingsWindowController extends OauthAuthorizingController 
         outgoingHostField.textProperty().addListener(e -> loginFailedFlag = false);
         oauthCheckBox.selectedProperty().addListener(e -> loginFailedFlag = false);
 
-        ObservableList<EmailAccount> accounts = FXCollections.observableArrayList();
-        accounts.addAll(emailManager.getEmailAccounts());
-        accounts.addAll(emailManager.getInvalidEmailAccounts());
-        emailAccountChoiceBox.setItems(accounts);
+        emailAccountChoiceBox.setItems(emailManager.getAllEmailAccounts());
         emailAccountChoiceBox.setValue(emailManager.getEmailAccounts().get(0));
     }
 

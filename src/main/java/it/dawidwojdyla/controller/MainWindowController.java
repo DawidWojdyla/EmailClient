@@ -80,6 +80,12 @@ public class MainWindowController extends AbstractController implements Initiali
         viewFactory.showLoginWindow();
     }
 
+
+    @FXML
+    void deleteAccountAction() {
+        viewFactory.showDeleteAccountWindow();
+    }
+
     @FXML
     void composeMessageAction() {
         viewFactory.showComposeMessageWindow(ComposeMessageType.DEFAULT);

@@ -1,5 +1,7 @@
 package it.dawidwojdyla.model;
 
+import javafx.concurrent.Service;
+
 import javax.mail.Session;
 import javax.mail.Store;
 import java.util.Properties;
@@ -14,6 +16,16 @@ public class EmailAccount {
     private Properties properties;
     private Store store;
     private Session session;
+
+    public Service<Void> getFetchFolderService() {
+        return fetchFolderService;
+    }
+
+    public void setFetchFolderService(Service<Void> fetchFolderService) {
+        this.fetchFolderService = fetchFolderService;
+    }
+
+    private Service<Void> fetchFolderService;
 
     public Session getSession() {
         return session;
@@ -52,6 +64,7 @@ public class EmailAccount {
     public void setStore(Store store) {
         this.store = store;
     }
+
 
     @Override
     public String toString() {

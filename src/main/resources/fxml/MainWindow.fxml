@@ -17,6 +17,7 @@
             <items>
               <MenuItem mnemonicParsing="false" onAction="#closeAction" text="Close" />
                   <MenuItem mnemonicParsing="false" onAction="#addAccountAction" text="Add account" />
+                  <MenuItem mnemonicParsing="false" onAction="#deleteAccountAction" text="Delete account" />
                   <MenuItem mnemonicParsing="false" onAction="#accountSettingsAction" text="Account settings" />
                   <MenuItem mnemonicParsing="false" onAction="#composeMessageAction" text="Compose message" />
             </items>
