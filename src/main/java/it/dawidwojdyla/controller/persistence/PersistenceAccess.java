@@ -22,7 +22,7 @@ public class PersistenceAccess {
             FileInputStream fileInputStream = new FileInputStream(VERIFIED_ACCOUNTS_LOCATION);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             List<VerifiedAccount> persistedList = (List<VerifiedAccount>) objectInputStream.readObject();
-            decodePasswords(persistedList);
+            decodeAuthenticators(persistedList);
             accountList.addAll(persistedList);
         } catch (Exception e) {
             e.printStackTrace();
@@ -30,15 +30,29 @@ public class PersistenceAccess {
         return accountList;
     }
 
-    private void decodePasswords(List<VerifiedAccount> persistedList) {
+    private void decodeAuthenticators(List<VerifiedAccount> persistedList) {
         for (VerifiedAccount account: persistedList) {
             account.setPassword(encoder.decode(account.getPassword()));
+
+            if (account.getAccessToken() != null) {
+                account.setAccessToken(encoder.decode(account.getAccessToken()));
+            }
+            if (account.getRefreshToken() != null) {
+                account.setRefreshToken(encoder.decode(account.getRefreshToken()));
+            }
         }
     }
 
-    private void encodePasswords(List<VerifiedAccount> persistedList) {
+    private void encodeAuthenticators(List<VerifiedAccount> persistedList) {
         for (VerifiedAccount account: persistedList) {
             account.setPassword(encoder.encode(account.getPassword()));
+
+            if (account.getAccessToken() != null) {
+                account.setAccessToken(encoder.encode(account.getAccessToken()));
+            }
+            if (account.getRefreshToken() != null) {
+                account.setRefreshToken(encoder.encode(account.getRefreshToken()));
+            }
         }
     }
 
@@ -47,7 +61,7 @@ public class PersistenceAccess {
             File file = new File(VERIFIED_ACCOUNTS_LOCATION);
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-            encodePasswords(accounts);
+            encodeAuthenticators(accounts);
             objectOutputStream.writeObject(accounts);
             objectOutputStream.close();
             fileOutputStream.close();

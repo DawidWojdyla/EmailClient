@@ -37,4 +37,24 @@ public class VerifiedAccount implements Serializable {
     public Properties getProperties() {
         return properties;
     }
+
+    public void setProperties(Properties properties) {
+        this.properties = properties;
+    }
+
+    public String getAccessToken() {
+        return properties.getProperty("access_token");
+    }
+
+    public void setAccessToken(String accessToken) {
+        properties.setProperty("access_token", accessToken);
+    }
+
+    public String getRefreshToken() {
+        return properties.getProperty("refresh_token");
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        properties.setProperty("refresh_token", refreshToken);
+    }
 }
