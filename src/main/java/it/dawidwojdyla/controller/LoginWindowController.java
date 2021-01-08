@@ -57,11 +57,10 @@ public class LoginWindowController extends OauthAuthorizingController implements
     @FXML
     void loginButtonActon() {
         if (!isLoginActionBlocked) {
+            isLoginActionBlocked = true;
             errorLabel.setText("");
-
             if (fieldsAreValid()) {
                 if (oauthCheckBox.isSelected()) {
-                    isLoginActionBlocked = true;
                     Oauth oauth = new Oauth(this);
                     oauth.startNewAutorization(emailAddressField.getText());
                 } else {
@@ -71,7 +70,7 @@ public class LoginWindowController extends OauthAuthorizingController implements
                 }
             }
         } else {
-            errorLabel.setText("OAuth2 authorization flow in progress...");
+            errorLabel.setText("Login in process...");
         }
     }
 
@@ -84,7 +83,7 @@ public class LoginWindowController extends OauthAuthorizingController implements
             properties.putAll(oauthTokens);
             logInToNewAccount(properties, true);
         }
-        isLoginActionBlocked = false;
+        //isLoginActionBlocked = false;
     }
 
     @Override
@@ -101,6 +100,7 @@ public class LoginWindowController extends OauthAuthorizingController implements
         loginService.start();
         loginService.setOnSucceeded(event -> {
             EmailLoginResult emailLoginResult = loginService.getValue();
+            isLoginActionBlocked = false;
             switch(emailLoginResult) {
                 case SUCCESS:
                     viewFactory.showMainWindow();

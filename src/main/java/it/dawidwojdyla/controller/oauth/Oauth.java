@@ -69,7 +69,6 @@ public class Oauth {
     }
 
     private String buildAuthorizationURL(String emailAddress) {
-        System.out.println("OAUTH: buildAuthorizationURL()");
         return oauthProperties.getProperty("authorization_server") +
                 "?scope=" + oauthProperties.getProperty("scope") +
                 "&response_type=code" +
