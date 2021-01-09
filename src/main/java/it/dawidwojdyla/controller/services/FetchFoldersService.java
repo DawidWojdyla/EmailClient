@@ -5,10 +5,7 @@ import it.dawidwojdyla.view.IconResolver;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Store;
+import javax.mail.*;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
 import java.util.List;
@@ -31,7 +28,7 @@ public class FetchFoldersService extends Service<Void> {
 
     @Override
     protected Task<Void> createTask() {
-        return new Task<Void>() {
+        return new Task<>() {
             @Override
             protected Void call() throws Exception {
                 fetchFolders();
@@ -73,23 +70,26 @@ public class FetchFoldersService extends Service<Void> {
                         e.printStackTrace();
                     }
                 }
-
             }
 
             @Override
-            public void messagesRemoved(MessageCountEvent messageCountEvent) {
-                System.out.println("Message removed event " + messageCountEvent);
+            public void messagesRemoved(MessageCountEvent event) {
+                System.out.println("Message removed event " + event);
+
+                for (Message message : event.getMessages()) {
+                    emailTreeItem.getEmailMessages().removeIf(m -> m.getMessage().equals(message));
+                }
             }
         });
     }
 
     private void fetchMessagesOnFolder(Folder folder, EmailTreeItem<String> emailTreeItem) {
-        Service fetchMesegesSerrvice = new Service() {
+        Service<Void> fetchMesegesSerrvice = new Service<>() {
             @Override
-            protected Task createTask() {
-                return new Task() {
+            protected Task<Void> createTask() {
+                return new Task<>() {
                     @Override
-                    protected Object call() throws Exception {
+                    protected Void call() throws Exception {
                         if(folder.getType() != Folder.HOLDS_FOLDERS) {
                             folder.open(Folder.READ_WRITE);
                             int folderSize = folder.getMessageCount();
