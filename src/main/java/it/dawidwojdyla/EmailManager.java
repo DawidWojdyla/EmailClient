@@ -1,5 +1,6 @@
 package it.dawidwojdyla;
 
+import com.sun.mail.imap.IMAPFolder;
 import it.dawidwojdyla.controller.services.FetchFoldersService;
 import it.dawidwojdyla.controller.services.FolderUpdaterService;
 import it.dawidwojdyla.model.EmailAccount;
@@ -10,10 +11,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javax.mail.Flags;
 import javax.mail.Folder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import java.util.*;
 
 /**
  * Created by Dawid on 2020-11-26.
@@ -27,11 +27,11 @@ public class EmailManager {
     private final IconResolver iconResolver = new IconResolver();
     private final HashMap<String, Properties> mailProperties = new HashMap<>();
     private final EmailTreeItem<String> foldersRoot = new EmailTreeItem<>("");
-    private final List<Folder> folderList = new ArrayList<>();
+    private HashMap<String, List<Folder>> folderLists = new HashMap<>();
 
     public EmailManager() {
         setProperties();
-        FolderUpdaterService folderUpdaterService = new FolderUpdaterService(folderList);
+        FolderUpdaterService folderUpdaterService = new FolderUpdaterService(folderLists);
         folderUpdaterService.start();
     }
 
@@ -120,7 +120,7 @@ public class EmailManager {
         emailAccounts.add(emailAccount);
         EmailTreeItem<String> treeItem = new EmailTreeItem<>(emailAccount.getAddress());
         treeItem.setGraphic(iconResolver.getIconForFolder(emailAccount.getAddress()));
-        FetchFoldersService fetchFoldersService = new FetchFoldersService(emailAccount.getStore(), treeItem, folderList);
+        FetchFoldersService fetchFoldersService = new FetchFoldersService(emailAccount.getStore(), treeItem, folderLists);
         fetchFoldersService.start();
         emailAccount.setFetchFolderService(fetchFoldersService);
         foldersRoot.getChildren().add(treeItem);
@@ -170,9 +170,35 @@ public class EmailManager {
 
     public void deleteSelectedMessage() {
         try {
-            selectedMessage.getMessage().setFlag(Flags.Flag.DELETED, true);
+
+            Message message = selectedMessage.getMessage();
             selectedFolder.getEmailMessages().remove(selectedMessage);
-        } catch (Exception e) {
+            Folder folderFrom = message.getFolder();
+            IMAPFolder imapFolder = (IMAPFolder) folderFrom;
+
+            if (folderFrom.getName().toLowerCase().equals("trash") || folderFrom.getName().toLowerCase().equals("kosz")) {
+
+                message.setFlag(Flags.Flag.DELETED, true);
+                imapFolder.expunge();
+
+            } else {
+
+                EmailTreeItem<String> emailTreeItem = (EmailTreeItem<String>) selectedFolder.getParent();
+                while (!emailTreeItem.getValue().contains("@")) {
+                    emailTreeItem = (EmailTreeItem<String>) emailTreeItem.getParent();
+                }
+
+                List<Folder> folderList = folderLists.get(emailTreeItem.getValue());
+
+                for (Folder folder : folderList) {
+                    if (folder.getName().toLowerCase().equals("trash") || folder.getName().toLowerCase().equals("kosz")) {
+                        imapFolder.moveMessages(new Message[]{message}, folder);
+                        break;
+                    }
+                }
+            }
+
+        } catch (MessagingException e) {
             e.printStackTrace();
         }
     }

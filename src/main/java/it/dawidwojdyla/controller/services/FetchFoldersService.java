@@ -5,9 +5,14 @@ import it.dawidwojdyla.view.IconResolver;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
-import javax.mail.*;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Store;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -17,13 +22,13 @@ public class FetchFoldersService extends Service<Void> {
 
     private Store store;
     private EmailTreeItem<String> foldersRoot;
-    private List<Folder> folderList;
+    private HashMap<String, List<Folder>> folderLists;
     private IconResolver iconResolver = new IconResolver();
 
-    public FetchFoldersService(Store store, EmailTreeItem<String> foldersRoot, List<Folder> folderList) {
+    public FetchFoldersService(Store store, EmailTreeItem<String> foldersRoot, HashMap<String, List<Folder>> folderLists) {
         this.store = store;
         this.foldersRoot = foldersRoot;
-        this.folderList = folderList;
+        this.folderLists = folderLists;
     }
 
     @Override
@@ -39,10 +44,12 @@ public class FetchFoldersService extends Service<Void> {
 
     private void fetchFolders() throws MessagingException {
         Folder[] folders = store.getDefaultFolder().list();
-        handleFolders(folders, foldersRoot);
+        List<Folder> folderList = new ArrayList<>();
+        folderLists.put(foldersRoot.getValue(), folderList);
+        handleFolders(folders, foldersRoot, folderList);
     }
 
-    private void handleFolders(Folder[] folders, EmailTreeItem<String> foldersRoot) throws MessagingException {
+    private void handleFolders(Folder[] folders, EmailTreeItem<String> foldersRoot, List<Folder> folderList) throws MessagingException {
         for(Folder folder: folders) {
             folderList.add(folder);
             EmailTreeItem<String> emailTreeItem = new EmailTreeItem<>(folder.getName());
@@ -53,7 +60,7 @@ public class FetchFoldersService extends Service<Void> {
             fetchMessagesOnFolder(folder, emailTreeItem);
             if(folder.getType() == Folder.HOLDS_FOLDERS) {
                 Folder[] subfolders = folder.list();
-                handleFolders(subfolders, emailTreeItem);
+                handleFolders(subfolders, emailTreeItem, folderList);
             }
         }
     }
@@ -74,8 +81,6 @@ public class FetchFoldersService extends Service<Void> {
 
             @Override
             public void messagesRemoved(MessageCountEvent event) {
-                System.out.println("Message removed event " + event);
-
                 for (Message message : event.getMessages()) {
                     emailTreeItem.getEmailMessages().removeIf(m -> m.getMessage().equals(message));
                 }
