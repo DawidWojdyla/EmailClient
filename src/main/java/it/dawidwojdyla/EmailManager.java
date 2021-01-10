@@ -9,10 +9,12 @@ import it.dawidwojdyla.model.EmailTreeItem;
 import it.dawidwojdyla.view.IconResolver;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.util.*;
 
 /**
@@ -148,23 +150,34 @@ public class EmailManager {
         }
     }
 
-    public void setRead() {
+    public void setMessageReadState(boolean isRead) {
         try {
-            selectedMessage.setRead(true);
-            selectedMessage.getMessage().setFlag(Flags.Flag.SEEN, true);
-            selectedFolder.decrementUnreadMessagesCount();
-        } catch (Exception e) {
+            selectedMessage.getMessage().setFlag(Flags.Flag.SEEN, isRead);
+            MimeMessage mimeMessage = (MimeMessage) selectedMessage.getMessage();
+            manageMessageReadStateInEachFolder(isRead, mimeMessage.getMessageID(), getRoot(selectedFolder));
+        } catch (MessagingException e) {
             e.printStackTrace();
         }
+
     }
 
-    public void setUnread() {
-        try {
-            selectedMessage.setRead(false);
-            selectedMessage.getMessage().setFlag(Flags.Flag.SEEN, false);
-            selectedFolder.incrementUnreadMessagesCount();
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void manageMessageReadStateInEachFolder(boolean isRead, String messageId, EmailTreeItem<String> emailTreeItem) throws MessagingException {
+        for (TreeItem<String> child: emailTreeItem.getChildren()) {
+            if (child.isExpanded()) {
+                manageMessageReadStateInEachFolder(isRead, messageId, (EmailTreeItem<String>) child);
+            } else {
+                EmailTreeItem<String> item = (EmailTreeItem<String>) child;
+                for (EmailMessage emailMessage: item.getEmailMessages()) {
+                    if (emailMessage.getMimeMessage().getMessageID().equals(messageId)) {
+                        emailMessage.setRead(isRead);
+                        if (isRead) {
+                            item.decrementUnreadMessagesCount();
+                        } else {
+                            item.incrementUnreadMessagesCount();
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -183,12 +196,7 @@ public class EmailManager {
 
             } else {
 
-                EmailTreeItem<String> emailTreeItem = (EmailTreeItem<String>) selectedFolder.getParent();
-                while (!emailTreeItem.getValue().contains("@")) {
-                    emailTreeItem = (EmailTreeItem<String>) emailTreeItem.getParent();
-                }
-
-                List<Folder> folderList = folderLists.get(emailTreeItem.getValue());
+                List<Folder> folderList = folderLists.get(getRoot(selectedFolder).getValue());
 
                 for (Folder folder : folderList) {
                     if (folder.getName().toLowerCase().equals("trash") || folder.getName().toLowerCase().equals("kosz")) {
@@ -201,5 +209,12 @@ public class EmailManager {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+    }
+
+    private EmailTreeItem<String> getRoot(EmailTreeItem<String> emailTreeItem) {
+        while (!emailTreeItem.getValue().contains("@")) {
+            emailTreeItem = (EmailTreeItem<String>) emailTreeItem.getParent();
+        }
+        return emailTreeItem;
     }
 }

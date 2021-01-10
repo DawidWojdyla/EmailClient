@@ -2,9 +2,9 @@ package it.dawidwojdyla.model;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-
 import javax.mail.Message;
 import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -91,5 +91,9 @@ public class EmailMessage {
         if(!attachmentList.contains(mimeBodyPart)) {
             attachmentList.add(mimeBodyPart);
         }
+    }
+
+    public MimeMessage getMimeMessage() {
+        return (MimeMessage) message;
     }
 }

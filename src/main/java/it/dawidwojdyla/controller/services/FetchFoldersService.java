@@ -4,7 +4,6 @@ import it.dawidwojdyla.model.EmailTreeItem;
 import it.dawidwojdyla.view.IconResolver;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -89,7 +88,7 @@ public class FetchFoldersService extends Service<Void> {
     }
 
     private void fetchMessagesOnFolder(Folder folder, EmailTreeItem<String> emailTreeItem) {
-        Service<Void> fetchMesegesSerrvice = new Service<>() {
+        Service<Void> fetchMessagesSerrvice = new Service<>() {
             @Override
             protected Task<Void> createTask() {
                 return new Task<>() {
@@ -107,6 +106,6 @@ public class FetchFoldersService extends Service<Void> {
                 };
             }
         };
-        fetchMesegesSerrvice.start();
+        fetchMessagesSerrvice.start();
     }
 }

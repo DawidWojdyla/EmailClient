@@ -110,7 +110,7 @@ public class MainWindowController extends AbstractController implements Initiali
     private void setUpContextMenus() {
 
         markUnreadMenuItem.setOnAction(event -> {
-            emailManager.setUnread();
+            emailManager.setMessageReadState(false);
             emailsTableView.refresh();
         });
 
@@ -134,7 +134,7 @@ public class MainWindowController extends AbstractController implements Initiali
                 emailManager.setSelectedMessage(emailMessage);
 
                 if(!emailMessage.isRead()) {
-                    emailManager.setRead();
+                    emailManager.setMessageReadState(true);
                     emailsTableView.refresh();
                 }
 
